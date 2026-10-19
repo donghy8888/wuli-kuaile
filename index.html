@@ -81,7 +81,8 @@
       </button>
       <button class="game-tile t5" data-game="cards">
         <div class="gt-emoji">📜</div>
-        <div class="gt-body"><div class="gt-name">公式卡片</div><div class="gt-desc">全部公式和单位一页看完</div></div>
+        <div class="gt-body"><div class="gt-name">公式卡片 · 记忆练习</div><div class="gt-desc">公式一览 + 挖空 / 变形小游戏</div></div>
+        <div class="gt-best" data-best="drill"></div>
       </button>
     </div>
     <footer class="foot">按人教版初中物理章节编写 · 进度保存在本机浏览器里 · 计算题按题目给的 g 值计算</footer>
@@ -97,7 +98,7 @@
 
   <!-- 章节地图 -->
   <section class="screen" id="scrMap">
-    <div class="lab-hero"><div class="lab-hero-t map-t">🗺️ 章节闯关</div><div class="lab-hero-s">每章先看知识卡，再闯关；正确率越高星星越多</div></div>
+    <div class="lab-hero"><div class="lab-hero-t map-t">🗺️ 章节闯关</div><div class="lab-hero-s">每章先看知识卡，题目由易到难；不会可点提示，正确率越高星星越多</div></div>
     <div id="mapList"></div>
   </section>
 
@@ -122,6 +123,8 @@
     <div class="q-card card-panel" id="qCard">
       <div class="q-tag" id="qTag"></div>
       <div class="q-text" id="qText"></div>
+      <button type="button" class="hint-btn" id="btnHint" hidden>💡 提示</button>
+      <div class="hint-box" id="hintBox" hidden></div>
     </div>
     <div class="ph-opts" id="qOpts"></div>
     <div class="num-wrap" id="numWrap" hidden>
@@ -168,6 +171,15 @@
 
   <!-- 公式卡片 -->
   <section class="screen" id="scrCards">
+    <div class="drill-entry card-panel">
+      <div class="de-title">🧠 公式记忆练习</div>
+      <div class="de-sub">挖空填一填、变形变一变，玩着就把公式记住</div>
+      <div class="de-btns">
+        <button class="btn primary" data-drill="blank">✏️ 公式挖空</button>
+        <button class="btn" data-drill="transform">🔄 公式变形</button>
+        <button class="btn" data-drill="mix">🎲 混合练习</button>
+      </div>
+    </div>
     <div id="cardsList"></div>
   </section>
 

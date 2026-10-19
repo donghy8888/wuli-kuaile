@@ -21,7 +21,7 @@
   let wrongBook = store.get('wl_wrong', {});        // qid -> {n, t, q}
   const stat = Object.assign({ done: 0, right: 0, streak: 0, last: '' }, store.get('wl_stat', {}));
   const saveWrong = () => store.set('wl_wrong', wrongBook);
-  const snap = q => ({ t: q.t, tag: q.tag, q: q.q, opts: q.opts, ans: q.ans, unit: q.unit, ex: q.ex, id: q.id, ch: q.ch });
+  const snap = q => ({ t: q.t, tag: q.tag, q: q.q, opts: q.opts, ans: q.ans, unit: q.unit, ex: q.ex, hint: q.hint, id: q.id, ch: q.ch });
   function addWrong(q) { const w = wrongBook[q.id] || { n: 0 }; w.n++; w.t = Date.now(); w.q = snap(q); wrongBook[q.id] = w; saveWrong(); }
   function delWrong(id) { if (wrongBook[id]) { delete wrongBook[id]; saveWrong(); } }
   const dayStr = d => { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); };
@@ -149,14 +149,107 @@
     return Object.assign({ tag: '🔢 常数与换算' }, f);
   }
 
+
+  /* ---------- 公式记忆：挖空 / 变形 ---------- */
+  function genDrill(kind) {
+    const pool = FORMULAS.filter(f => inScope(f.g));
+    const use = pool.length ? pool : FORMULAS;
+    // 决定题型
+    let type = kind;
+    if (kind === 'mix') {
+      const canB = use.some(f => f.blanks && f.blanks.length);
+      const canT = use.some(f => f.alts && f.alts.length);
+      type = canB && canT ? (Math.random() < 0.55 ? 'blank' : 'transform') : canB ? 'blank' : 'transform';
+    }
+    if (type === 'blank') {
+      const withB = use.filter(f => f.blanks && f.blanks.length);
+      const f = rand(withB.length ? withB : FORMULAS.filter(x => x.blanks && x.blanks.length));
+      const b = rand(f.blanks);
+      const opts = shuffle(b.opts.slice());
+      // ensure ans in opts
+      if (!opts.includes(b.ans)) opts[0] = b.ans;
+      return {
+        t: 'c', id: 'db-' + f.id + '-' + b.show, ch: 'drill', tag: '✏️ 公式挖空',
+        q: `「${f.name}」把 □ 补上：<div class="fx-blank">${b.show.replace('□', '<span class="blank">____</span>')}</div>`,
+        opts: [b.ans, ...opts.filter(o => o !== b.ans)].slice(0, 4),
+        ex: `完整公式是 <b>${f.f}</b>${f.unit ? '，单位 ' + f.unit : ''}。挖空处是 <b>${b.ans}</b>。`,
+        hint: `这是「${f.name}」的公式，想想每个字母代表什么。`,
+      };
+    }
+    // transform
+    const withA = use.filter(f => f.alts && f.alts.length);
+    const f = rand(withA.length ? withA : FORMULAS.filter(x => x.alts && x.alts.length));
+    const r = Math.random();
+    if (r < 0.4) {
+      // 给出原式，选变形
+      const right = rand(f.alts);
+      const wrong = shuffle(FORMULAS.filter(o => o.id !== f.id).flatMap(o => [o.f, ...(o.alts || [])])).filter(x => x !== right).slice(0, 3);
+      return {
+        t: 'c', id: 'dt-' + f.id + '-alt', ch: 'drill', tag: '🔄 公式变形',
+        q: `已知 <span class="fx">${f.f}</span>，变形后正确的是？`,
+        opts: [right, ...wrong].slice(0, 4),
+        ex: `由 ${f.f} 变形可得 <b>${f.alts.join('、')}</b>。`,
+        hint: `「${f.name}」：把要求的量单独放等号左边。`,
+      };
+    }
+    if (r < 0.7) {
+      // 给出变形，认原式名
+      const alt = rand(f.alts);
+      const wrong = shuffle(FORMULAS.filter(o => o.id !== f.id && !(f.excl || []).includes(o.id)).map(o => o.name)).slice(0, 3);
+      return {
+        t: 'c', id: 'dt-' + f.id + '-name', ch: 'drill', tag: '🔄 公式变形',
+        q: `公式 <span class="fx">${alt}</span> 是由哪个公式变形来的？`,
+        opts: [f.name, ...wrong],
+        ex: `<b>${alt}</b> 由「${f.name}」${f.f} 变形得到。`,
+        hint: `看看式子里有哪些物理量，对应哪个公式。`,
+      };
+    }
+    // 情景：要求某个量用哪个式子
+    const target = rand([{ ask: '求质量 m', form: f.alts.find(a => a.trim().startsWith('m')) || f.alts[0] },
+      { ask: '把结果量单独放左边', form: f.alts[0] }]);
+    // 更稳妥的情景题：直接问“求 XX 时用哪一个”
+    const label = f.alts[0];
+    const askMap = {
+      v: '已知路程和时间，求速度',
+      rho: '已知质量和体积，求密度',
+      G: '已知质量，求重力',
+      p: '已知压力和受力面积，求压强',
+      W: '已知力和距离，求功',
+      P: '已知功和时间，求功率',
+      I: '已知电压和电阻，求电流',
+      Pe: '已知电压和电流，求电功率',
+      Q: '已知比热容、质量和温度变化，求吸热',
+      We: '已知电压、电流和时间，求电功',
+    };
+    const ask = askMap[f.id] || `使用「${f.name}」时`;
+    // 若有对应变形求某个量
+    let right = f.f;
+    let qtext = `${ask}，应选用？`;
+    if (f.id === 'rho' && Math.random() < 0.5) { right = 'm = ρ V'; qtext = '已知密度和体积，求质量，应选用？'; }
+    if (f.id === 'v' && Math.random() < 0.5) { right = 's = v t'; qtext = '已知速度和时间，求路程，应选用？'; }
+    if (f.id === 'I' && Math.random() < 0.5) { right = 'R = U / I'; qtext = '已知电压和电流，求电阻，应选用？'; }
+    if (f.id === 'G' && Math.random() < 0.5) { right = 'm = G / g'; qtext = '已知重力，求质量，应选用？'; }
+    if (f.id === 'p' && Math.random() < 0.5) { right = 'S = F / p'; qtext = '已知压力和压强，求受力面积，应选用？'; }
+    if (f.id === 'P' && Math.random() < 0.5) { right = 'W = P t'; qtext = '已知功率和时间，求功，应选用？'; }
+    if (f.id === 'Pe' && Math.random() < 0.5) { right = 'P = U² / R'; qtext = '已知电压和电阻，求电功率，应选用？'; }
+    const wrong = shuffle(FORMULAS.filter(o => o.id !== f.id).map(o => o.f)).slice(0, 3);
+    return {
+      t: 'c', id: 'dt-' + f.id + '-use', ch: 'drill', tag: '🔄 公式变形',
+      q: qtext,
+      opts: [right, ...wrong],
+      ex: `选用 <b>${right}</b>。原式「${f.name}」：${f.f}${f.alts && f.alts.length ? '；变形：' + f.alts.join('、') : ''}。`,
+      hint: `把题目要求的物理量单独放在等号左边。`,
+    };
+  }
+
   function QuizGame(opts) {
     this.opts = opts;
     const mode = opts.mode;
-    const timed = mode === 'blitz' || mode === 'rush';
+    const timed = mode === 'blitz' || mode === 'rush' || mode === 'drill' || mode === 'drill-blank' || mode === 'drill-transform' || mode === 'drill-mix';
     let list = [], i = 0, cur = null, running = false, busy = true, right = 0, wrong = 0, numStr = '';
     const misses = [];
     let timer = null;
-    if (mode === 'level') { const ch = CH[opts.ch]; list = shuffle(ch.qs).slice(0, 8); }
+    if (mode === 'level') { const ch = CH[opts.ch]; list = ch.qs.slice(0, Math.min(8, ch.qs.length)); /* 由易到难，不打乱 */ }
     else if (mode === 'practice') { list = shuffle(Object.values(wrongBook).map(w => w.q)); }
     else if (mode === 'blitz') { list = shuffle(CHAPTERS.filter(c => inScope(c.grade)).flatMap(c => c.qs)); }
     if (timed) timer = new Timer(settings.time, () => end());
@@ -164,6 +257,10 @@
 
     function render() {
       if (mode === 'rush') { let q; do { q = genRush(); } while (cur && q.id === cur.id); cur = q; }
+      else if (mode === 'drill' || mode === 'drill-blank' || mode === 'drill-transform' || mode === 'drill-mix') {
+        const kind = mode === 'drill-blank' ? 'blank' : mode === 'drill-transform' ? 'transform' : mode === 'drill-mix' ? 'mix' : (opts.drill || 'mix');
+        let q; do { q = genDrill(kind); } while (cur && q.id === cur.id); cur = q;
+      }
       else { if (i >= list.length) { if (mode === 'blitz') { list = shuffle(list); i = 0; } else return end(); } cur = list[i]; }
       if (!timed) progress(i, n);
       const ch = CH[cur.ch];
@@ -171,6 +268,13 @@
       $('#qText').innerHTML = cur.q;
       $('#qCard').classList.remove('in'); void $('#qCard').offsetWidth; $('#qCard').classList.add('in');
       $('#qNote').innerHTML = ''; $('#qNext').hidden = true;
+      const hb = $('#btnHint'), hx = $('#hintBox');
+      if (hb) {
+        const has = !!(cur.hint && String(cur.hint).trim());
+        hb.hidden = !has; hx.hidden = true; hx.textContent = '';
+        hb.onclick = () => { if (hx.hidden) { hx.hidden = false; hx.innerHTML = '💡 ' + cur.hint; SFX.tap(); hb.textContent = '💡 已显示提示'; } };
+        hb.textContent = '💡 提示';
+      }
       const box = $('#qOpts'); box.innerHTML = '';
       $('#numWrap').hidden = cur.t !== 'n';
       if (cur.t === 'n') {
@@ -228,11 +332,11 @@
       if (ok) {
         right++; hud.add(timed ? 10 : 10); SFX.ding(hud.combo);
         if (mode === 'practice') delWrong(cur.id);
-        $('#qNote').innerHTML = `<b class="okc">✔ 正确！</b>${mode === 'practice' ? '（已移出错题本）' : ''} ${cur.ex}`;
+        $('#qNote').innerHTML = `<b class="okc">✔ 正确！</b>${mode === 'practice' ? '（已移出错题本）' : ''}<div class="ex-block">📖 解析：${cur.ex}</div>`;
       } else {
         wrong++; hud.miss(); SFX.wrong(); addWrong(cur); misses.push(cur);
         $('#qCard').classList.add('shake'); setTimeout(() => $('#qCard').classList.remove('shake'), 400);
-        $('#qNote').innerHTML = `<b class="badc">✘ 答错了</b>　${corr}${cur.ex}`;
+        $('#qNote').innerHTML = `<b class="badc">✘ 答错了</b>　${corr}<div class="ex-block">📖 解析：${cur.ex}</div>`;
       }
       i++;
       if (timed && ok) setTimeout(() => { if (running) render(); }, 750);
@@ -256,7 +360,9 @@
       } else if (mode === 'practice') {
         finish({ title: '📒 错题练习完成', key: 'practice', stats: st, misses, again: () => Object.keys(wrongBook).length ? startQuiz({ mode: 'practice' }) : openWrong() });
       } else {
-        finish({ title: '⏰ 时间到！', key: mode, stats: st, misses, again: () => startQuiz({ mode }) });
+        const againMode = mode;
+        const againOpts = mode.startsWith('drill') ? { mode, drill: opts.drill } : { mode };
+        finish({ title: '⏰ 时间到！', key: mode.startsWith('drill') ? 'drill' : mode, stats: st, misses, again: () => startQuiz(againOpts) });
       }
     }
     this.start = () => {
@@ -371,12 +477,18 @@
       + `<h3 class="sec-h">🔢 常用常数 & 换算</h3><div class="fc-list">${FACTS.map(f => `<div class="fcard sm"><div class="fc-n">${f.q.replace(/[=是为约]+$/, '')}</div><div class="fc-f">${f.opts[0]}</div></div>`).join('')}</div>`
       + `<h3 class="sec-h">📏 物理量与单位</h3><div class="unit-grid">${UNITS.map(u => `<div class="uchip"><span>${u.q}</span><b>${u.u}</b></div>`).join('')}</div><div style="height:24px"></div>`;
   }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-drill]');
+    if (!b) return;
+    SFX.tap();
+    startQuiz({ mode: 'drill-' + b.dataset.drill });
+  });
 
   /* ---------- 首页 ---------- */
   function refreshMenu() {
     $$('#segTime button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.time));
     $$('#segScope button').forEach(b => b.classList.toggle('on', b.dataset.v === settings.scope));
-    ['rush', 'match', 'blitz'].forEach(k => ($(`[data-best="${k}"]`).textContent = best[k] ? '最佳 ' + best[k] : ''));
+    ['rush', 'match', 'blitz', 'drill'].forEach(k => { const el = $(`[data-best="${k}"]`); if (el) el.textContent = best[k] ? '最佳 ' + best[k] : ''; });
     const total = Object.values(stars).reduce((a, b) => a + b, 0);
     $('#mapBest').textContent = total ? `⭐ ${total}/${CHAPTERS.length * 3}` : '';
     $('#stStars').textContent = total;
@@ -394,10 +506,11 @@
   function startQuiz(opts) {
     stopAll(); $('#modal').hidden = true; SFX.unlock();
     if (opts.mode === 'practice' && !Object.keys(wrongBook).length) { toast('错题本是空的 🎉'); return openWrong(); }
-    view = opts.mode === 'level' ? 'level' : opts.mode === 'practice' ? 'practice' : 'game';
+    view = opts.mode === 'level' ? 'level' : opts.mode === 'practice' ? 'practice' : opts.mode.startsWith('drill') ? 'drill' : 'game';
     if (opts.mode === 'level') viewArg = opts.ch;
-    const titles = { rush: '⚡ 公式抢答', blitz: '⏱️ 限时大乱斗', practice: '📒 错题练习' };
-    setBrand(opts.mode === 'level' ? `${CH[opts.ch].emoji} 第${CH[opts.ch].no}章 闯关` : titles[opts.mode]);
+    const titles = { rush: '⚡ 公式抢答', blitz: '⏱️ 限时大乱斗', practice: '📒 错题练习',
+      drill: '🧠 公式记忆', 'drill-blank': '✏️ 公式挖空', 'drill-transform': '🔄 公式变形', 'drill-mix': '🎲 混合练习' };
+    setBrand(opts.mode === 'level' ? `${CH[opts.ch].emoji} 第${CH[opts.ch].no}章 闯关` : (titles[opts.mode] || '练习'));
     show('scrQuiz');
     current = new QuizGame(opts); window.WL.game = current; current.start();
   }
@@ -408,6 +521,7 @@
     if (name === 'cards') { view = 'cards'; renderCards(); setBrand('📜 公式卡片'); return show('scrCards'); }
     if (name === 'lab') return window.WL.openLab();
     if (name === 'rush' || name === 'blitz') return startQuiz({ mode: name });
+    if (name === 'drill-blank' || name === 'drill-transform' || name === 'drill-mix') return startQuiz({ mode: name });
     if (name === 'match') { view = 'game'; setBrand('🔗 单位连连看'); show('scrMatch'); current = new MatchGame(); window.WL.game = current; current.start(); }
   }
   function back() {
@@ -415,6 +529,7 @@
     if (view === 'chapter') return startGame('map');
     if (view === 'level') return openChapter(viewArg);
     if (view === 'practice') return openWrong();
+    if (view === 'drill') return startGame('cards');
     if (view === 'sim') return window.WL.simBack();
     goHome();
   }
