@@ -1,0 +1,155 @@
+/* 快乐掌握物理 · 专属样式（与化学背背背同一套设计语言） */
+.t6 .gt-emoji{background:#d9f5ff}.t7 .gt-emoji{background:#ffe8d6}
+.new-badge{font-size:10px;background:#ff3d71;color:#fff;border-radius:8px;padding:1px 6px;vertical-align:3px}
+.muted{color:var(--muted);font-size:13px}
+.okc{color:var(--ok)} .badc{color:var(--bad)}
+.shake{animation:shake .4s}
+.lab-hero{text-align:center;margin:4px 0 12px}
+.lab-hero-t{font-size:30px;font-weight:900;color:#00a3c4;text-shadow:3px 3px 0 #fff}
+.lab-hero-t.map-t{color:var(--pri)}
+.lab-hero-s{color:var(--muted);font-size:14px}
+.sec-h{margin:16px 2px 8px;font-size:16px;font-weight:900}
+
+/* 首页数据条 */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.ss{background:#fff;border-radius:14px;box-shadow:var(--shadow);text-align:center;padding:7px 2px 5px}
+.ss b{display:block;font-size:20px;font-weight:900;color:var(--pri);font-variant-numeric:tabular-nums}
+.ss span{font-size:11px;color:var(--muted);font-weight:700}
+
+/* 章节地图 */
+.map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.map-tile{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;transition:transform .1s}
+.map-tile:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(45,48,71,.15)}
+.mt-no{position:absolute;top:5px;left:8px;font-size:11px;font-weight:900;color:var(--muted)}
+.mt-emoji{font-size:28px;line-height:1.2}
+.mt-name{font-size:14px;font-weight:800;text-align:center;line-height:1.25}
+.mt-stars{font-size:14px;color:#d5d8e6;letter-spacing:1px}
+.map-tile.some .mt-stars,.map-tile.full .mt-stars{color:#ffb400}
+.map-tile.full{background:linear-gradient(160deg,#fffbe8,#fff)}
+@media (min-width:520px){.map-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* 章节详情 */
+.ch-head{display:flex;gap:12px;align-items:center}
+.ch-emoji{font-size:40px;width:64px;height:64px;border-radius:18px;background:#e8f1ff;display:grid;place-items:center;flex:none}
+.ch-no{font-size:12px;color:var(--muted);font-weight:700}
+.ch-name{font-size:22px;font-weight:900}
+.ch-stars{font-size:13px;color:var(--muted)}
+.ch-stars .st{color:#ffb400;font-size:16px;letter-spacing:1px}
+.kp-list{display:flex;flex-direction:column;gap:6px}
+.kp{display:flex;gap:10px;background:#fff;border-radius:14px;box-shadow:0 2px 0 rgba(45,48,71,.08);padding:9px 12px;font-size:14.5px;line-height:1.6}
+.kp b{color:var(--pri)}
+.kp-n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;margin-top:2px}
+.fc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.fcard{background:linear-gradient(160deg,#fff,#f3f8ff);border:2px solid #d6e6ff;border-radius:14px;padding:8px 10px}
+.fc-n{font-size:12px;font-weight:800;color:var(--muted)}
+.fc-f{font-size:18px;font-weight:900;color:#1d5fc9;margin:2px 0;font-family:"Times New Roman","Noto Serif CJK SC",serif;font-style:italic;line-height:1.3}
+.fc-u{font-size:11.5px;color:#5c6380;line-height:1.4}
+.fcard.sm .fc-f{font-size:15px}
+.ch-actions{display:flex;gap:10px;justify-content:center;margin:18px 0 24px;flex-wrap:wrap}
+.ch-actions .btn[hidden]{display:none}
+.btn.big{font-size:18px;padding:14px 26px}
+.btn.mini{padding:4px 10px;font-size:13px}
+.cards-ch{margin-bottom:10px}
+.cc-h{font-weight:800;margin:6px 2px}
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.uchip{background:#fff;border-radius:12px;box-shadow:0 2px 0 #d7d9ea;padding:6px 8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.uchip b{color:#e8505b}
+
+/* 答题 */
+.q-card{padding:14px 14px 16px}
+.q-card.in{animation:pop .35s}
+.q-tag{font-size:12px;font-weight:800;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.qt-type{background:#e8f1ff;color:var(--pri);border-radius:8px;padding:1px 8px}
+.q-text{font-size:19px;font-weight:900;margin-top:8px;line-height:1.5}
+.q-text .fx,.opt .fx{font-family:"Times New Roman",serif;font-style:italic;color:#1d5fc9}
+.ph-opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ph-opts.tf{flex-direction:row}
+.ph-opts.tf .opt{flex:1;text-align:center;font-size:18px;padding:16px 8px}
+.opt{text-align:left;padding:12px 14px;border-radius:14px;background:#fff;box-shadow:0 3px 0 #c7c9e0;font-size:15.5px;font-weight:700;line-height:1.45;transition:transform .08s}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt.right{background:var(--ok);color:#fff;box-shadow:0 3px 0 #00896d}
+.opt.wrongpick{background:var(--bad);color:#fff;animation:shake .4s}
+.opt:disabled{opacity:1}
+.opt:disabled:not(.right):not(.wrongpick){opacity:.55}
+.ph-note{margin-top:10px;font-size:14.5px;line-height:1.6;min-height:24px;background:rgba(255,255,255,.75);border-radius:12px;padding:0 10px}
+.ph-note:empty{background:none}
+.ph-note:not(:empty){padding:8px 12px}
+.ph-note b{color:var(--pri)} .ph-note .okc{color:var(--ok)} .ph-note .badc{color:var(--bad)}
+.ph-next{margin:12px auto 0;display:block;min-width:60%}
+.ph-next[hidden]{display:none}
+.num-wrap{margin-top:12px}
+.num-wrap[hidden]{display:none}
+.num-show{display:flex;align-items:baseline;justify-content:center;gap:8px;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:10px;margin-bottom:10px}
+.num-val{font-size:32px;font-weight:900;min-width:90px;text-align:center;border-bottom:3px dashed var(--pri2);font-variant-numeric:tabular-nums}
+.num-val.empty{color:#c9cde0}
+.num-val.ok{color:var(--ok);border-color:var(--ok)} .num-val.bad{color:var(--bad);border-color:var(--bad);animation:shake .4s}
+.num-unit{font-size:20px;font-weight:800;color:var(--muted)}
+.numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.numpad .key{height:50px;color:var(--ink)}
+.numpad .w2{grid-column:span 2}
+.numpad .go{background:var(--pri);color:#fff;box-shadow:0 4px 0 #1d5fc9;font-size:18px}
+
+/* 连连看 */
+.mtile.long{font-size:17px}
+.mtile.nm{font-size:20px}
+
+/* 结算星星 */
+.m-stars{font-size:46px;letter-spacing:6px;margin-top:4px}
+.m-stars[hidden]{display:none}
+.m-stars span{color:#e3e5ef;display:inline-block}
+.m-stars span.on{color:#ffb400;animation:starIn .5s both;text-shadow:0 3px 0 #e09a00}
+@keyframes starIn{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.m-miss .lab-mrow{gap:8px;font-size:13px}
+.lab-mrow span{flex:1.4} .lab-mrow b{flex:1;font-weight:700;color:#0a8f6d;text-align:right}
+.m-btns .btn[hidden]{display:none}
+
+/* 错题本 */
+.wb-lab-list{padding:12px 0 24px}
+.wb-lab{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px 12px;margin-bottom:8px;font-size:14px;line-height:1.55;position:relative}
+.wb-kind{position:absolute;right:10px;top:8px;font-size:11px;font-weight:800;background:#e3f0ff;color:#1d5fc9;border-radius:8px;padding:1px 6px}
+.wb-q{font-weight:800;padding-right:70px}
+.wb-a{color:#0a8f6d;font-weight:700}
+.wb-ex{color:#5c6380;font-size:13px}
+.wb-actions{flex-wrap:wrap}
+.wb-actions .btn[hidden]{display:none}
+
+/* 实验室 */
+.sim-task{padding:10px 12px}
+.sim-task.pop{animation:pop .4s}
+.tk-dots{display:flex;gap:5px;margin-bottom:6px}
+.td{width:22px;height:6px;border-radius:4px;background:#e1e4f0}
+.td.on{background:var(--ok)} .td.cur{background:var(--warn)}
+.tk-t{font-size:15.5px;font-weight:800;line-height:1.5}
+.tk-t b{color:#e8505b}
+.tk-h{font-size:13px;color:var(--muted);margin-top:4px}
+.tk-h summary{cursor:pointer;font-weight:700}
+.sim-stage{margin-top:10px;padding:6px;overflow:hidden}
+.sim-svg{width:100%;height:auto;display:block;border-radius:12px}
+.sim-svg .st{font-size:11px;font-weight:700;fill:#2d3047;font-family:inherit}
+.sim-svg .st.m{fill:#7a7f9a;font-size:10.5px}
+.sim-svg .st.b{font-weight:900;font-size:13px}
+.sim-svg .st.big{font-size:17px}
+.sim-svg .st.r{fill:#e8505b} .sim-svg .st.o{fill:#e08600} .sim-svg .st.bl{fill:#2f7cf6} .sim-svg .st.ok{fill:#00a37a} .sim-svg .st.w{fill:#fff}
+.flow{animation:flow 1s linear infinite}
+@keyframes flow{from{stroke-dashoffset:32}to{stroke-dashoffset:0}}
+.sim-read{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.sr{background:#fff;border-radius:12px;box-shadow:0 2px 0 #d7d9ea;padding:6px 4px;text-align:center}
+.sr span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.sr b{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+.sr.r b{color:#e8505b} .sr.o b{color:#e08600} .sr.bl b{color:#2f7cf6} .sr.ok b{color:#00a37a}
+.sim-ctrl{display:flex;flex-direction:column;gap:10px;margin-top:12px;background:rgba(255,255,255,.9);border-radius:18px;box-shadow:var(--shadow);padding:12px}
+.sc-row{display:flex;flex-direction:column;gap:6px}
+.sc-row.step{flex-direction:row;align-items:center;justify-content:space-between}
+.sc-l{font-size:14px;font-weight:800;display:flex;justify-content:space-between}
+.sc-l b{color:var(--pri)}
+.sc-row .seg button{font-size:13px}
+input[type=range]{width:100%;height:30px;accent-color:var(--pri)}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:40px;height:40px;border-radius:12px;background:#fff;box-shadow:0 3px 0 #c7c9e0;font-size:22px;font-weight:900;color:var(--pri)}
+.stepper button:active{transform:translateY(3px);box-shadow:none}
+.stepper b{min-width:62px;text-align:center;font-size:16px}
+.sim-tips{margin:12px 0 24px;font-size:14px;line-height:1.6;background:#fff7dd;border-radius:14px;padding:10px 12px}
+.sim-tips small{color:var(--muted)}
+.toast{left:0;right:0;margin:0 auto;width:max-content;transform:translateY(20px)}
+.toast.show{transform:translateY(0)}
+html,body{overflow-x:hidden}

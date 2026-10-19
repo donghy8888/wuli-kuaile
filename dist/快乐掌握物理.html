@@ -1,0 +1,1972 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2f7cf6">
+<title>快乐掌握物理 · 初中物理闯关</title>
+<meta name="description" content="初中物理闯关小游戏：19 章闯关、物理实验室模拟、公式抢答、单位连连看、错题本">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
+<style>
+:root{
+  --bg1:#e6f4ff; --bg2:#fff4e0; --ink:#2d3047; --muted:#7a7f9a;
+  --pri:#2f7cf6; --pri2:#8ab8ff; --ok:#00b894; --bad:#ff5e57; --warn:#fdcb6e;
+  --card:#ffffff; --back1:#2f7cf6; --back2:#00c2d1; --radius:14px;
+  --shadow:0 4px 0 rgba(45,48,71,.15), 0 8px 18px rgba(45,48,71,.10);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans CJK SC","Noto Sans SC",sans-serif;
+  color:var(--ink); background:linear-gradient(160deg,var(--bg1),var(--bg2)) fixed;
+  -webkit-user-select:none; user-select:none; overscroll-behavior:none;
+}
+button{font-family:inherit;color:inherit;cursor:pointer;border:0;background:none}
+sub{font-size:.62em;vertical-align:-.25em;line-height:0}
+sup{font-size:.62em;vertical-align:.55em;line-height:0}
+#app{max-width:560px;margin:0 auto;min-height:100dvh;position:relative;padding:0 10px calc(10px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+
+.topbar{display:flex;align-items:center;justify-content:space-between;height:52px;padding-top:env(safe-area-inset-top)}
+.brand{font-weight:800;font-size:20px;letter-spacing:1px;flex:1;text-align:center}
+.icon-btn{width:42px;height:42px;border-radius:12px;background:#fff;box-shadow:var(--shadow);font-size:20px}
+.icon-btn[hidden]{display:block;visibility:hidden}
+
+.screen{display:none;flex-direction:column;flex:1}
+.screen.active{display:flex}
+
+/* ---------- 首页 ---------- */
+.hero{text-align:center;margin:6px 0 12px}
+.hero-title{font-size:34px;font-weight:900;color:var(--pri);text-shadow:3px 3px 0 #fff, 5px 5px 0 rgba(47,124,246,.2)}
+.hero-title span{color:#ff8a3d;margin-left:4px;display:inline-block;animation:wob 2.4s ease-in-out infinite}
+@keyframes wob{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg) scale(1.06)}}
+.hero-sub{color:var(--muted);margin-top:4px}
+.card-panel{background:rgba(255,255,255,.9);border-radius:18px;box-shadow:var(--shadow);padding:12px}
+.settings{display:flex;flex-direction:column;gap:10px;margin-bottom:14px}
+.set-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.set-label{font-weight:700;font-size:14px;min-width:84px}
+.seg{display:flex;background:#e8f1ff;border-radius:12px;padding:3px;flex:1}
+.seg button{flex:1;padding:8px 2px;border-radius:9px;font-size:14px;font-weight:700;color:var(--muted)}
+.seg button.on{background:var(--pri);color:#fff;box-shadow:0 2px 0 #1d5fc9}
+.menu{display:grid;grid-template-columns:1fr;gap:10px}
+.game-tile{display:flex;align-items:center;gap:12px;text-align:left;padding:14px;border-radius:18px;background:#fff;box-shadow:var(--shadow);position:relative;transition:transform .1s}
+.game-tile:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(45,48,71,.15)}
+.gt-emoji{font-size:34px;width:54px;height:54px;border-radius:16px;display:grid;place-items:center;flex:none}
+.t1 .gt-emoji{background:#ffe0e6}.t2 .gt-emoji{background:#dff7ef}.t3 .gt-emoji{background:#fff3cf}.t4 .gt-emoji{background:#e5e9ff}.t5 .gt-emoji{background:#f0e4ff}
+.gt-name{font-size:18px;font-weight:800}
+.gt-desc{font-size:13px;color:var(--muted);margin-top:2px}
+.gt-best{margin-left:auto;font-size:12px;font-weight:800;color:var(--pri);white-space:nowrap}
+.soon{opacity:.55;box-shadow:none;border:2px dashed #c9c9e0;background:transparent}
+.foot{font-size:12px;color:var(--muted);text-align:center;margin:16px 6px 8px;line-height:1.5}
+@media (min-width:520px){.menu{grid-template-columns:1fr 1fr}}
+
+/* ---------- HUD ---------- */
+.hud{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;position:relative}
+.hud[hidden]{display:none}
+.hud-item{background:#fff;border-radius:12px;box-shadow:var(--shadow);text-align:center;padding:4px 0 2px}
+.hud-k{font-size:11px;color:var(--muted);font-weight:700}
+.hud-v{font-size:22px;font-weight:900;font-variant-numeric:tabular-nums}
+#hudCombo.hot{color:#ff7a00;animation:pop .3s}
+.timer.low .hud-v{color:var(--bad);animation:pulse .5s infinite alternate}
+@keyframes pulse{to{transform:scale(1.15)}}
+@keyframes pop{0%{transform:scale(1.6)}100%{transform:scale(1)}}
+.timebar{grid-column:1/-1;height:6px;background:#fff;border-radius:6px;overflow:hidden}
+#timebarFill{height:100%;width:100%;background:linear-gradient(90deg,var(--ok),var(--warn),var(--bad));background-size:300% 100%;transition:width .25s linear}
+
+/* ---------- 周期表网格 ---------- */
+.ptable-wrap{position:relative}
+.ptable{display:grid;grid-template-columns:repeat(12,1fr);grid-template-rows:repeat(6,auto);gap:3px}
+.gtable{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:8px}
+.gtable.big{grid-template-columns:repeat(4,1fr);gap:8px;margin-top:0}
+.gtable:empty,.ptable:empty{display:none}
+.cell{aspect-ratio:1/1.3;border-radius:7px;position:relative;perspective:400px;font-size:clamp(10px,3.4vw,16px)}
+.cell .ci{position:absolute;inset:0;transition:transform .4s;transform-style:preserve-3d}
+.cell .cf{position:absolute;inset:0;border-radius:7px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:grid;place-items:center;font-weight:800}
+.cell .cb{background:linear-gradient(135deg,var(--back1),var(--back2));color:rgba(255,255,255,.85);box-shadow:0 2px 0 rgba(0,0,0,.15)}
+.cell .cfr{background:#fff;transform:rotateY(180deg);box-shadow:0 2px 0 rgba(0,0,0,.12);line-height:1}
+.cell.up .ci{transform:rotateY(180deg)}
+.cell.cur .cfr{outline:3px solid #ff7aa8;outline-offset:1px;background:#fff6fa}
+.cell.dead .ci{transform:rotateY(180deg)}
+.cell.dead .cfr{background:#d7f8ec;color:#0a8f6d}
+.cell.dead .cfr::after{content:"✕";position:absolute;inset:0;display:grid;place-items:center;color:rgba(255,94,87,.35);font-size:1.7em}
+.cell.noble .cb{background:repeating-linear-gradient(45deg,#d8dbe8,#d8dbe8 4px,#e8eaf3 4px,#e8eaf3 8px);color:#9aa0b8}
+.cell.missed{animation:shake .4s}
+.cell .lbl{white-space:nowrap}
+.gtable .cell{aspect-ratio:1/1;font-size:clamp(9px,2.8vw,14px)}
+.gtable.big .cell{aspect-ratio:1.3/1;font-size:20px}
+.cell.hit{animation:hitShake .35s}
+@keyframes hitShake{0%,100%{transform:none}25%{transform:translate(-2px,1px) rotate(-6deg)}75%{transform:translate(2px,-1px) rotate(6deg)}}
+@keyframes shake{0%,100%{transform:none}20%,60%{transform:translateX(-4px)}40%,80%{transform:translateX(4px)}}
+
+/* 特效层 */
+.fx-layer{position:fixed;inset:0;pointer-events:none;z-index:30}
+.bullet{position:fixed;width:6px;height:22px;border-radius:3px;background:linear-gradient(#fff6a0,#ff9f1a);box-shadow:0 0 10px #ffb400;transform-origin:center}
+.spark{position:fixed;width:8px;height:8px;border-radius:50%;pointer-events:none}
+.boom-ring{position:fixed;width:20px;height:20px;border-radius:50%;border:4px solid #ffb400;transform:translate(-50%,-50%);animation:ring .5s ease-out forwards}
+@keyframes ring{to{width:110px;height:110px;opacity:0;border-width:1px}}
+.kill-tag{position:fixed;transform:translate(-50%,-50%);font-weight:900;font-size:22px;color:#ff3d71;text-shadow:2px 2px 0 #fff,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff;animation:killUp .9s ease-out forwards;white-space:nowrap}
+@keyframes killUp{0%{opacity:0;transform:translate(-50%,-30%) scale(.4)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-180%) scale(1)}}
+.flash{position:fixed;inset:0;background:#fff;opacity:.0;animation:flash .25s}
+@keyframes flash{0%{opacity:.5}100%{opacity:0}}
+
+/* 大牌 + 提示 */
+.qzone{display:flex;gap:12px;align-items:center;margin:12px 0 10px}
+.bigcard{width:112px;height:132px;flex:none;perspective:700px}
+.bc-inner{width:100%;height:100%;position:relative;transition:transform .45s cubic-bezier(.3,1.4,.6,1);transform-style:preserve-3d}
+.bigcard.up .bc-inner{transform:rotateY(180deg)}
+.bc-face{position:absolute;inset:0;border-radius:18px;backface-visibility:hidden;-webkit-backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.bc-back{background:linear-gradient(135deg,var(--back1),var(--back2));color:#fff;font-size:56px;font-weight:900}
+.bc-front{background:#fff;transform:rotateY(180deg);border:3px solid #ff7aa8}
+.bc-z{position:absolute;top:6px;left:10px;font-size:13px;color:var(--muted);font-weight:700}
+.bc-sym{font-size:46px;font-weight:900;line-height:1.05}
+.bc-sym.grp{font-size:34px}
+.bc-name{font-size:18px;font-weight:700;margin-top:2px}
+.bc-badge{position:absolute;top:6px;right:6px;background:var(--warn);font-size:11px;font-weight:800;padding:1px 6px;border-radius:8px}
+.bc-badge[hidden]{display:none}
+.bigcard.killed .bc-front{border-color:var(--ok);background:#effff9}
+.bigcard.killed{animation:pop .3s}
+.bigcard.wrong .bc-front{border-color:var(--bad);background:#fff4f4}
+.bigcard.wrong{animation:shake .4s}
+.qside{flex:1;min-width:0}
+.qprompt{font-size:17px;font-weight:800}
+.feedback{margin-top:6px;font-size:14px;min-height:62px;line-height:1.45}
+.feedback .ok{color:var(--ok);font-weight:900;font-size:18px}
+.feedback .bad{color:var(--bad);font-weight:900;font-size:18px}
+.feedback .vals{display:inline-flex;gap:4px;flex-wrap:wrap;vertical-align:middle}
+.vchip{display:inline-block;padding:1px 7px;border-radius:8px;background:#e8f1ff;color:var(--pri);font-weight:800;font-size:14px}
+.vchip.picked{background:var(--ok);color:#fff}
+.feedback .note{color:var(--muted);font-size:12px;display:block;margin-top:2px}
+
+/* 键盘 */
+.keypad{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:auto}
+.key{height:54px;border-radius:14px;font-size:22px;font-weight:900;background:#fff;box-shadow:0 4px 0 #c7c9e0;transition:transform .06s}
+.key.pos{color:#e8505b}
+.key.neg{color:#2f80ed;background:#eef6ff;box-shadow:0 4px 0 #b9d4f5}
+.key:active,.key.press{transform:translateY(4px);box-shadow:0 0 0 #c7c9e0}
+.key:disabled{opacity:.5}
+.keypad.armneg .key.neg{outline:3px solid #2f80ed}
+.kb-hint{font-size:11px;color:var(--muted);text-align:center;margin-top:8px}
+@media (hover:none){.kb-hint{display:none}}
+.crosshair{position:fixed;bottom:-60px;left:50%;font-size:30px;pointer-events:none;transition:transform .12s;z-index:31;display:none}
+
+/* ---------- 连连看 ---------- */
+.match-tip{text-align:center;font-size:13px;color:var(--muted);margin:2px 0 10px}
+.match-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.mtile{height:76px;border-radius:16px;background:#fff;box-shadow:var(--shadow);font-weight:900;display:grid;place-items:center;transition:transform .12s, opacity .3s}
+.mtile.sym{font-size:28px;color:var(--pri)}
+.mtile.nm{font-size:22px;color:#e8505b;background:#fffaf0}
+.mtile.sel{transform:scale(1.06);outline:4px solid #ff8a3d}
+.mtile.gone{opacity:0;transform:scale(.3) rotate(20deg);pointer-events:none}
+.mtile.no{animation:shake .4s;outline:4px solid var(--bad)}
+@media (min-width:520px){.match-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* ---------- 化学式 ---------- */
+.f-question{text-align:center}
+.f-title{font-weight:800;font-size:16px}
+.f-ions{display:flex;justify-content:center;align-items:center;gap:16px;margin:12px 0 6px;font-size:40px;font-weight:900}
+.ion{display:inline-flex;flex-direction:column;align-items:center;line-height:1}
+.ion .iv{font-size:18px;color:#e8505b;margin-bottom:4px}
+.ion .iv.n{color:#2f80ed}
+.ion .in{font-size:13px;color:var(--muted);margin-top:6px;font-weight:700}
+.f-plus{font-size:28px;color:var(--muted)}
+.f-hint{font-size:12px;color:var(--muted)}
+.f-options{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.fopt{height:74px;border-radius:16px;background:#fff;box-shadow:var(--shadow);font-size:28px;font-weight:900}
+.fopt.right{background:var(--ok);color:#fff}
+.fopt.wrongpick{background:var(--bad);color:#fff;animation:shake .4s}
+.f-feedback{text-align:center;margin-top:14px;font-size:16px;min-height:48px;font-weight:700}
+
+/* ---------- 错题本 / 口诀 ---------- */
+.wb-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:800;font-size:18px;flex-wrap:wrap}
+.wb-head small{font-size:12px;color:var(--muted)}
+.wb-actions{display:flex;gap:8px}
+.wb-list,.cheat-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-top:12px;padding-bottom:20px}
+.wb-item{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px;display:flex;gap:10px;align-items:center}
+.wb-sym{font-size:26px;font-weight:900;min-width:56px;text-align:center;color:var(--pri)}
+.wb-info{font-size:13px;line-height:1.5}
+.wb-info b{font-size:15px}
+.wb-cnt{color:var(--bad);font-size:12px;font-weight:700}
+.wb-empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px 0;font-size:15px}
+.poem p{margin:4px 0;font-size:16px;font-weight:700;text-align:center}
+.poem .poem2{color:var(--pri);margin-top:10px}
+.cheat-list .wb-item.noble{opacity:.6}
+
+.btn{padding:11px 16px;border-radius:14px;font-weight:800;font-size:15px;background:#fff;box-shadow:0 3px 0 #c7c9e0}
+.btn.primary{background:var(--pri);color:#fff;box-shadow:0 3px 0 #1d5fc9}
+.btn.ghost{background:transparent;box-shadow:none;color:var(--muted)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+
+/* ---------- 弹窗 ---------- */
+.modal{position:fixed;inset:0;background:rgba(45,48,71,.45);display:grid;place-items:center;z-index:50;padding:16px}
+.modal[hidden]{display:none}
+.modal-box{background:#fff;border-radius:22px;width:min(100%,420px);max-height:90dvh;overflow:auto;padding:18px;text-align:center;animation:pop .35s}
+.m-title{font-size:26px;font-weight:900;color:var(--pri)}
+.m-record{margin-top:6px;font-size:18px;font-weight:900;color:#ff7a00;animation:pulse .6s infinite alternate}
+.m-record[hidden]{display:none}
+.m-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0}
+.m-stat{background:#eef5ff;border-radius:12px;padding:8px 2px}
+.m-stat b{display:block;font-size:22px}
+.m-stat span{font-size:12px;color:var(--muted)}
+.m-miss{text-align:left;font-size:14px}
+.m-miss h4{margin:6px 0}
+.m-miss .mrow{display:flex;justify-content:space-between;padding:6px 8px;border-bottom:1px dashed #e3e4ef}
+.m-btns{display:flex;gap:8px;justify-content:center;margin-top:16px;flex-wrap:wrap}
+
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);background:rgba(45,48,71,.92);color:#fff;padding:10px 16px;border-radius:14px;font-size:14px;opacity:0;transition:.25s;z-index:60;max-width:88vw;text-align:center;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.countdown{position:fixed;inset:0;display:grid;place-items:center;font-size:110px;font-weight:900;color:var(--pri);text-shadow:4px 4px 0 #fff;z-index:40;background:rgba(255,255,255,.35);pointer-events:none}
+.countdown[hidden]{display:none}
+.countdown span{animation:pop .5s}
+</style>
+<style>
+/* 快乐掌握物理 · 专属样式（与化学背背背同一套设计语言） */
+.t6 .gt-emoji{background:#d9f5ff}.t7 .gt-emoji{background:#ffe8d6}
+.new-badge{font-size:10px;background:#ff3d71;color:#fff;border-radius:8px;padding:1px 6px;vertical-align:3px}
+.muted{color:var(--muted);font-size:13px}
+.okc{color:var(--ok)} .badc{color:var(--bad)}
+.shake{animation:shake .4s}
+.lab-hero{text-align:center;margin:4px 0 12px}
+.lab-hero-t{font-size:30px;font-weight:900;color:#00a3c4;text-shadow:3px 3px 0 #fff}
+.lab-hero-t.map-t{color:var(--pri)}
+.lab-hero-s{color:var(--muted);font-size:14px}
+.sec-h{margin:16px 2px 8px;font-size:16px;font-weight:900}
+
+/* 首页数据条 */
+.stats-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.ss{background:#fff;border-radius:14px;box-shadow:var(--shadow);text-align:center;padding:7px 2px 5px}
+.ss b{display:block;font-size:20px;font-weight:900;color:var(--pri);font-variant-numeric:tabular-nums}
+.ss span{font-size:11px;color:var(--muted);font-weight:700}
+
+/* 章节地图 */
+.map-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.map-tile{background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:10px 4px 8px;display:flex;flex-direction:column;align-items:center;gap:2px;position:relative;transition:transform .1s}
+.map-tile:active{transform:translateY(3px);box-shadow:0 1px 0 rgba(45,48,71,.15)}
+.mt-no{position:absolute;top:5px;left:8px;font-size:11px;font-weight:900;color:var(--muted)}
+.mt-emoji{font-size:28px;line-height:1.2}
+.mt-name{font-size:14px;font-weight:800;text-align:center;line-height:1.25}
+.mt-stars{font-size:14px;color:#d5d8e6;letter-spacing:1px}
+.map-tile.some .mt-stars,.map-tile.full .mt-stars{color:#ffb400}
+.map-tile.full{background:linear-gradient(160deg,#fffbe8,#fff)}
+@media (min-width:520px){.map-grid{grid-template-columns:repeat(4,1fr)}}
+
+/* 章节详情 */
+.ch-head{display:flex;gap:12px;align-items:center}
+.ch-emoji{font-size:40px;width:64px;height:64px;border-radius:18px;background:#e8f1ff;display:grid;place-items:center;flex:none}
+.ch-no{font-size:12px;color:var(--muted);font-weight:700}
+.ch-name{font-size:22px;font-weight:900}
+.ch-stars{font-size:13px;color:var(--muted)}
+.ch-stars .st{color:#ffb400;font-size:16px;letter-spacing:1px}
+.kp-list{display:flex;flex-direction:column;gap:6px}
+.kp{display:flex;gap:10px;background:#fff;border-radius:14px;box-shadow:0 2px 0 rgba(45,48,71,.08);padding:9px 12px;font-size:14.5px;line-height:1.6}
+.kp b{color:var(--pri)}
+.kp-n{flex:none;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:12px;font-weight:900;display:grid;place-items:center;margin-top:2px}
+.fc-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.fcard{background:linear-gradient(160deg,#fff,#f3f8ff);border:2px solid #d6e6ff;border-radius:14px;padding:8px 10px}
+.fc-n{font-size:12px;font-weight:800;color:var(--muted)}
+.fc-f{font-size:18px;font-weight:900;color:#1d5fc9;margin:2px 0;font-family:"Times New Roman","Noto Serif CJK SC",serif;font-style:italic;line-height:1.3}
+.fc-u{font-size:11.5px;color:#5c6380;line-height:1.4}
+.fcard.sm .fc-f{font-size:15px}
+.ch-actions{display:flex;gap:10px;justify-content:center;margin:18px 0 24px;flex-wrap:wrap}
+.ch-actions .btn[hidden]{display:none}
+.btn.big{font-size:18px;padding:14px 26px}
+.btn.mini{padding:4px 10px;font-size:13px}
+.cards-ch{margin-bottom:10px}
+.cc-h{font-weight:800;margin:6px 2px}
+.unit-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:6px}
+.uchip{background:#fff;border-radius:12px;box-shadow:0 2px 0 #d7d9ea;padding:6px 8px;display:flex;justify-content:space-between;align-items:center;font-size:13px}
+.uchip b{color:#e8505b}
+
+/* 答题 */
+.q-card{padding:14px 14px 16px}
+.q-card.in{animation:pop .35s}
+.q-tag{font-size:12px;font-weight:800;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.qt-type{background:#e8f1ff;color:var(--pri);border-radius:8px;padding:1px 8px}
+.q-text{font-size:19px;font-weight:900;margin-top:8px;line-height:1.5}
+.q-text .fx,.opt .fx{font-family:"Times New Roman",serif;font-style:italic;color:#1d5fc9}
+.ph-opts{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.ph-opts.tf{flex-direction:row}
+.ph-opts.tf .opt{flex:1;text-align:center;font-size:18px;padding:16px 8px}
+.opt{text-align:left;padding:12px 14px;border-radius:14px;background:#fff;box-shadow:0 3px 0 #c7c9e0;font-size:15.5px;font-weight:700;line-height:1.45;transition:transform .08s}
+.opt:active{transform:translateY(3px);box-shadow:none}
+.opt.right{background:var(--ok);color:#fff;box-shadow:0 3px 0 #00896d}
+.opt.wrongpick{background:var(--bad);color:#fff;animation:shake .4s}
+.opt:disabled{opacity:1}
+.opt:disabled:not(.right):not(.wrongpick){opacity:.55}
+.ph-note{margin-top:10px;font-size:14.5px;line-height:1.6;min-height:24px;background:rgba(255,255,255,.75);border-radius:12px;padding:0 10px}
+.ph-note:empty{background:none}
+.ph-note:not(:empty){padding:8px 12px}
+.ph-note b{color:var(--pri)} .ph-note .okc{color:var(--ok)} .ph-note .badc{color:var(--bad)}
+.ph-next{margin:12px auto 0;display:block;min-width:60%}
+.ph-next[hidden]{display:none}
+.num-wrap{margin-top:12px}
+.num-wrap[hidden]{display:none}
+.num-show{display:flex;align-items:baseline;justify-content:center;gap:8px;background:#fff;border-radius:16px;box-shadow:var(--shadow);padding:10px;margin-bottom:10px}
+.num-val{font-size:32px;font-weight:900;min-width:90px;text-align:center;border-bottom:3px dashed var(--pri2);font-variant-numeric:tabular-nums}
+.num-val.empty{color:#c9cde0}
+.num-val.ok{color:var(--ok);border-color:var(--ok)} .num-val.bad{color:var(--bad);border-color:var(--bad);animation:shake .4s}
+.num-unit{font-size:20px;font-weight:800;color:var(--muted)}
+.numpad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.numpad .key{height:50px;color:var(--ink)}
+.numpad .w2{grid-column:span 2}
+.numpad .go{background:var(--pri);color:#fff;box-shadow:0 4px 0 #1d5fc9;font-size:18px}
+
+/* 连连看 */
+.mtile.long{font-size:17px}
+.mtile.nm{font-size:20px}
+
+/* 结算星星 */
+.m-stars{font-size:46px;letter-spacing:6px;margin-top:4px}
+.m-stars[hidden]{display:none}
+.m-stars span{color:#e3e5ef;display:inline-block}
+.m-stars span.on{color:#ffb400;animation:starIn .5s both;text-shadow:0 3px 0 #e09a00}
+@keyframes starIn{0%{transform:scale(0) rotate(-90deg)}70%{transform:scale(1.3)}100%{transform:scale(1)}}
+.m-miss .lab-mrow{gap:8px;font-size:13px}
+.lab-mrow span{flex:1.4} .lab-mrow b{flex:1;font-weight:700;color:#0a8f6d;text-align:right}
+.m-btns .btn[hidden]{display:none}
+
+/* 错题本 */
+.wb-lab-list{padding:12px 0 24px}
+.wb-lab{background:#fff;border-radius:14px;box-shadow:var(--shadow);padding:10px 12px;margin-bottom:8px;font-size:14px;line-height:1.55;position:relative}
+.wb-kind{position:absolute;right:10px;top:8px;font-size:11px;font-weight:800;background:#e3f0ff;color:#1d5fc9;border-radius:8px;padding:1px 6px}
+.wb-q{font-weight:800;padding-right:70px}
+.wb-a{color:#0a8f6d;font-weight:700}
+.wb-ex{color:#5c6380;font-size:13px}
+.wb-actions{flex-wrap:wrap}
+.wb-actions .btn[hidden]{display:none}
+
+/* 实验室 */
+.sim-task{padding:10px 12px}
+.sim-task.pop{animation:pop .4s}
+.tk-dots{display:flex;gap:5px;margin-bottom:6px}
+.td{width:22px;height:6px;border-radius:4px;background:#e1e4f0}
+.td.on{background:var(--ok)} .td.cur{background:var(--warn)}
+.tk-t{font-size:15.5px;font-weight:800;line-height:1.5}
+.tk-t b{color:#e8505b}
+.tk-h{font-size:13px;color:var(--muted);margin-top:4px}
+.tk-h summary{cursor:pointer;font-weight:700}
+.sim-stage{margin-top:10px;padding:6px;overflow:hidden}
+.sim-svg{width:100%;height:auto;display:block;border-radius:12px}
+.sim-svg .st{font-size:11px;font-weight:700;fill:#2d3047;font-family:inherit}
+.sim-svg .st.m{fill:#7a7f9a;font-size:10.5px}
+.sim-svg .st.b{font-weight:900;font-size:13px}
+.sim-svg .st.big{font-size:17px}
+.sim-svg .st.r{fill:#e8505b} .sim-svg .st.o{fill:#e08600} .sim-svg .st.bl{fill:#2f7cf6} .sim-svg .st.ok{fill:#00a37a} .sim-svg .st.w{fill:#fff}
+.flow{animation:flow 1s linear infinite}
+@keyframes flow{from{stroke-dashoffset:32}to{stroke-dashoffset:0}}
+.sim-read{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.sr{background:#fff;border-radius:12px;box-shadow:0 2px 0 #d7d9ea;padding:6px 4px;text-align:center}
+.sr span{display:block;font-size:11px;color:var(--muted);font-weight:700}
+.sr b{font-size:14px;font-weight:900;font-variant-numeric:tabular-nums}
+.sr.r b{color:#e8505b} .sr.o b{color:#e08600} .sr.bl b{color:#2f7cf6} .sr.ok b{color:#00a37a}
+.sim-ctrl{display:flex;flex-direction:column;gap:10px;margin-top:12px;background:rgba(255,255,255,.9);border-radius:18px;box-shadow:var(--shadow);padding:12px}
+.sc-row{display:flex;flex-direction:column;gap:6px}
+.sc-row.step{flex-direction:row;align-items:center;justify-content:space-between}
+.sc-l{font-size:14px;font-weight:800;display:flex;justify-content:space-between}
+.sc-l b{color:var(--pri)}
+.sc-row .seg button{font-size:13px}
+input[type=range]{width:100%;height:30px;accent-color:var(--pri)}
+.stepper{display:flex;align-items:center;gap:8px}
+.stepper button{width:40px;height:40px;border-radius:12px;background:#fff;box-shadow:0 3px 0 #c7c9e0;font-size:22px;font-weight:900;color:var(--pri)}
+.stepper button:active{transform:translateY(3px);box-shadow:none}
+.stepper b{min-width:62px;text-align:center;font-size:16px}
+.sim-tips{margin:12px 0 24px;font-size:14px;line-height:1.6;background:#fff7dd;border-radius:14px;padding:10px 12px}
+.sim-tips small{color:var(--muted)}
+.toast{left:0;right:0;margin:0 auto;width:max-content;transform:translateY(20px)}
+.toast.show{transform:translateY(0)}
+html,body{overflow-x:hidden}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <button class="icon-btn" id="btnHome" aria-label="返回" hidden>🏠</button>
+    <div class="brand" id="brand">⚛️ 快乐掌握物理</div>
+    <button class="icon-btn" id="btnMute" aria-label="静音切换">🔊</button>
+  </header>
+
+  <!-- 首页 -->
+  <section class="screen active" id="scrHome">
+    <div class="hero">
+      <div class="hero-title">快乐掌握<span>物理</span></div>
+      <div class="hero-sub">闯关 · 做实验 · 记公式，物理原来这么好玩 ✨</div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="ss"><b id="stStars">0</b><span>⭐ 星星</span></div>
+      <div class="ss"><b id="stStreak">0</b><span>🔥 连续天数</span></div>
+      <div class="ss"><b id="stDone">0</b><span>📝 答题数</span></div>
+      <div class="ss"><b id="stAcc">-</b><span>🎯 正确率</span></div>
+    </div>
+
+    <div class="settings card-panel">
+      <div class="set-row">
+        <span class="set-label">⏱ 限时时长</span>
+        <div class="seg" id="segTime">
+          <button data-v="30">30秒</button><button data-v="60">60秒</button><button data-v="90">90秒</button><button data-v="120">120秒</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <span class="set-label">📚 题目范围</span>
+        <div class="seg" id="segScope">
+          <button data-v="all">全部</button><button data-v="8a">八上</button><button data-v="8b">八下</button><button data-v="9">九年级</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu" id="menu">
+      <button class="game-tile t1" data-game="map">
+        <div class="gt-emoji">🗺️</div>
+        <div class="gt-body"><div class="gt-name">章节闯关</div><div class="gt-desc">19 章知识点卡 + 闯关题，答得好拿 3 颗星</div></div>
+        <div class="gt-best" id="mapBest"></div>
+      </button>
+      <button class="game-tile t6" data-game="lab">
+        <div class="gt-emoji">🔬</div>
+        <div class="gt-body"><div class="gt-name">物理实验室 <span class="new-badge">NEW</span></div><div class="gt-desc">拖一拖、调一调：光的反射折射、凸透镜、杠杆、浮力、欧姆定律</div></div>
+        <div class="gt-best" id="labBest"></div>
+      </button>
+      <button class="game-tile t3" data-game="rush">
+        <div class="gt-emoji">⚡</div>
+        <div class="gt-body"><div class="gt-name">公式抢答</div><div class="gt-desc">公式、单位、常数换算，限时快答</div></div>
+        <div class="gt-best" data-best="rush"></div>
+      </button>
+      <button class="game-tile t2" data-game="match">
+        <div class="gt-emoji">🔗</div>
+        <div class="gt-body"><div class="gt-name">单位连连看</div><div class="gt-desc">物理量 ↔ 单位，限时配对</div></div>
+        <div class="gt-best" data-best="match"></div>
+      </button>
+      <button class="game-tile t7" data-game="blitz">
+        <div class="gt-emoji">⏱️</div>
+        <div class="gt-body"><div class="gt-name">限时大乱斗</div><div class="gt-desc">所选范围内的题目随机出，比比谁答得多</div></div>
+        <div class="gt-best" data-best="blitz"></div>
+      </button>
+      <button class="game-tile t4" data-game="wrongbook">
+        <div class="gt-emoji">📒</div>
+        <div class="gt-body"><div class="gt-name">错题本</div><div class="gt-desc">答错的题自动收进来，练对就移除</div></div>
+        <div class="gt-best" id="wbCount"></div>
+      </button>
+      <button class="game-tile t5" data-game="cards">
+        <div class="gt-emoji">📜</div>
+        <div class="gt-body"><div class="gt-name">公式卡片</div><div class="gt-desc">全部公式和单位一页看完</div></div>
+      </button>
+    </div>
+    <footer class="foot">按人教版初中物理章节编写 · 进度保存在本机浏览器里 · 计算题按题目给的 g 值计算</footer>
+  </section>
+
+  <!-- 共用 HUD -->
+  <div class="hud" id="hud" hidden>
+    <div class="hud-item"><div class="hud-k">得分</div><div class="hud-v" id="hudScore">0</div></div>
+    <div class="hud-item"><div class="hud-k">连击</div><div class="hud-v" id="hudCombo">0</div></div>
+    <div class="hud-item timer"><div class="hud-k" id="hudTimeK">时间</div><div class="hud-v" id="hudTime">60</div></div>
+    <div class="timebar"><div id="timebarFill"></div></div>
+  </div>
+
+  <!-- 章节地图 -->
+  <section class="screen" id="scrMap">
+    <div class="lab-hero"><div class="lab-hero-t map-t">🗺️ 章节闯关</div><div class="lab-hero-s">每章先看知识卡，再闯关；正确率越高星星越多</div></div>
+    <div id="mapList"></div>
+  </section>
+
+  <!-- 章节详情：知识卡 -->
+  <section class="screen" id="scrChapter">
+    <div class="ch-head card-panel">
+      <div class="ch-emoji" id="chEmoji"></div>
+      <div class="ch-info"><div class="ch-no" id="chNo"></div><div class="ch-name" id="chName"></div><div class="ch-stars" id="chStars"></div></div>
+    </div>
+    <h3 class="sec-h">📌 知识要点</h3>
+    <div class="kp-list" id="chPoints"></div>
+    <h3 class="sec-h" id="chFormH">🧮 公式与单位</h3>
+    <div class="fc-list" id="chForms"></div>
+    <div class="ch-actions">
+      <button class="btn primary big" id="btnChStart">🚀 开始闯关</button>
+      <button class="btn" id="btnChSim" hidden>🔬 去做实验</button>
+    </div>
+  </section>
+
+  <!-- 答题（闯关 / 大乱斗 / 抢答 / 错题练习共用） -->
+  <section class="screen" id="scrQuiz" data-hud="1">
+    <div class="q-card card-panel" id="qCard">
+      <div class="q-tag" id="qTag"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="ph-opts" id="qOpts"></div>
+    <div class="num-wrap" id="numWrap" hidden>
+      <div class="num-show"><span id="numVal" class="num-val"></span><span class="num-unit" id="numUnit"></span></div>
+      <div class="numpad" id="numpad"></div>
+    </div>
+    <div class="ph-note" id="qNote"></div>
+    <button class="btn primary ph-next" id="qNext" hidden>下一题 ▶</button>
+  </section>
+
+  <!-- 单位连连看 -->
+  <section class="screen" id="scrMatch" data-hud="1">
+    <div class="match-tip">点一个物理量，再点它的国际单位！清空一版 +5 秒</div>
+    <div class="match-grid" id="matchGrid"></div>
+  </section>
+
+  <!-- 实验室菜单 -->
+  <section class="screen" id="scrLab">
+    <div class="lab-hero"><div class="lab-hero-t">🔬 物理实验室</div><div class="lab-hero-s">动手调参数，完成任务拿徽章</div></div>
+    <div class="menu" id="labMenu"></div>
+    <footer class="foot">模拟中的数据取 g = 10 N/kg；示意图不按真实比例。</footer>
+  </section>
+
+  <!-- 实验模拟 -->
+  <section class="screen" id="scrSim">
+    <div class="sim-task card-panel" id="simTask"></div>
+    <div class="sim-stage card-panel" id="simStage"></div>
+    <div class="sim-read" id="simRead"></div>
+    <div class="sim-ctrl" id="simCtrl"></div>
+    <div class="sim-tips" id="simTips"></div>
+  </section>
+
+  <!-- 错题本 -->
+  <section class="screen" id="scrWrong">
+    <div class="wb-head card-panel">
+      <div>📒 错题本 <small id="wbSub"></small></div>
+      <div class="wb-actions">
+        <button class="btn primary" id="btnWbPractice">🎯 练错题</button>
+        <button class="btn ghost" id="btnWbClear">清空</button>
+      </div>
+    </div>
+    <div class="wb-lab-list" id="wbList"></div>
+  </section>
+
+  <!-- 公式卡片 -->
+  <section class="screen" id="scrCards">
+    <div id="cardsList"></div>
+  </section>
+
+  <!-- 结算弹窗 -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box">
+      <div class="m-title" id="mTitle">时间到！</div>
+      <div class="m-stars" id="mStars" hidden></div>
+      <div class="m-record" id="mRecord" hidden>🏆 新纪录！</div>
+      <div class="m-stats" id="mStats"></div>
+      <div class="m-miss" id="mMiss"></div>
+      <div class="m-btns">
+        <button class="btn primary" id="btnNextLv" hidden>下一章 ▶</button>
+        <button class="btn primary" id="btnAgain">再来一局</button>
+        <button class="btn" id="btnToWrong">错题本</button>
+        <button class="btn ghost" id="btnToHome">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="countdown" id="countdown" hidden></div>
+</div>
+<script>
+/* 快乐掌握物理 —— 题库与知识卡（初中物理，人教版章节顺序）
+ * 题目写法：
+ *   C(题干, [正确项, 干扰项...], 解析)      单选（显示时自动打乱）
+ *   T(题干, true/false, 解析)               判断
+ *   N(题干, 答案数字, '单位', 解析)          计算填空（屏幕数字键盘）
+ * 解析里可以写 HTML。g 未说明时按题干取值。
+ */
+(function () {
+  const C = (q, opts, ex) => ({ t: 'c', q, opts, ex });
+  const T = (q, ans, ex) => ({ t: 'tf', q, ans, ex });
+  const N = (q, ans, unit, ex) => ({ t: 'n', q, ans, unit, ex });
+
+  const CHAPTERS = [
+  /* ===================== 八年级上 ===================== */
+  { id: 'move', grade: '8a', emoji: '🚗', name: '机械运动',
+    points: ['长度国际单位是米（m）：1 km = 1000 m，1 m = 10 dm = 100 cm = 1000 mm。',
+      '刻度尺读数要<b>估读到分度值的下一位</b>。',
+      '<b>误差</b>不可避免，只能减小（多次测量取平均值、用精密仪器）；<b>错误</b>可以避免。',
+      '判断运动还是静止要先选<b>参照物</b>；运动和静止是<b>相对</b>的。',
+      '速度表示运动快慢：<b>1 m/s = 3.6 km/h</b>。',
+      '匀速直线运动：速度大小和方向都不变；平均速度 = 总路程 ÷ 总时间。'],
+    formulas: [{ n: '速度', f: 'v = s / t', u: 'v：m/s　s：m　t：s' }],
+    sim: null,
+    qs: [
+      C('坐在行驶的列车上，乘客说自己是静止的，他选择的参照物是', ['乘坐的车厢', '路边的树', '站台', '迎面驶来的列车'], '乘客相对于车厢的位置没有改变，所以以车厢为参照物他是静止的。'),
+      C('1 m/s 等于多少 km/h？', ['3.6 km/h', '36 km/h', '0.36 km/h', '1000 km/h'], '1 m/s = 1 m ÷ 1 s = 0.001 km ÷ (1/3600 h) = 3.6 km/h。'),
+      N('小明百米赛跑用时 12.5 s，他的平均速度是多少？', 8, 'm/s', 'v = s / t = 100 m ÷ 12.5 s = 8 m/s。'),
+      T('误差和错误一样，都可以避免。', false, '误差只能<b>减小</b>，不能消除；错误是由于不遵守规则造成的，可以避免。'),
+      C('用分度值为 1 mm 的刻度尺测量物体长度，下列记录正确的是', ['2.35 cm', '2.3 cm', '2.350 cm', '23 mm'], '分度值 1 mm，要估读到 0.1 mm：2.35 cm = 23.5 mm，最后一位“5”是估读值。'),
+      C('下列物体中，速度最大的是', ['奔跑的羚羊 25 m/s', '行驶的汽车 72 km/h', '百米运动员 10 m/s', '骑行的自行车 18 km/h'], '统一单位：72 km/h = 20 m/s，18 km/h = 5 m/s，所以羚羊 25 m/s 最快。'),
+      N('汽车以 20 m/s 的速度匀速行驶 3 min，通过的路程是多少？', 3600, 'm', 's = vt = 20 m/s × 180 s = 3600 m。注意 3 min = 180 s。'),
+      C('“两岸青山相对出，孤帆一片日边来”中，“青山相对出”选择的参照物是', ['船', '青山', '河岸', '太阳'], '以船为参照物，青山的位置在变化，所以青山是“运动”的。'),
+      C('关于匀速直线运动，下列说法正确的是', ['速度大小和方向都不变', '路程越长，速度越大', '时间越短，速度越大', '速度与路程成正比'], '匀速直线运动的速度是一个定值，与路程和时间无关。'),
+      C('测量长度时，多次测量取平均值的目的是', ['减小误差', '消除误差', '避免错误', '方便记录'], '多次测量求平均值可以<b>减小</b>误差，但不能消除误差。'),
+      N('一列长 200 m 的火车以 20 m/s 的速度完全通过长 1000 m 的大桥，需要多少时间？', 60, 's', '完全通过的路程 = 桥长 + 车长 = 1200 m，t = s / v = 1200 m ÷ 20 m/s = 60 s。'),
+    ] },
+  { id: 'sound', grade: '8a', emoji: '🔔', name: '声现象',
+    points: ['声音是由物体的<b>振动</b>产生的，振动停止，发声停止。',
+      '声音的传播需要介质，<b>真空不能传声</b>；一般 v固 > v液 > v气，15 ℃ 空气中声速约 <b>340 m/s</b>。',
+      '声音三特性：<b>音调</b>（由频率决定）、<b>响度</b>（与振幅、距离有关）、<b>音色</b>（由材料、结构决定）。',
+      '人耳听觉范围 20 Hz～20000 Hz；高于 20000 Hz 是超声波，低于 20 Hz 是次声波。',
+      '声可以传递<b>信息</b>（B 超、回声定位），也可以传递<b>能量</b>（超声波清洗、碎石）。',
+      '减弱噪声：在<b>声源处</b>、在<b>传播过程中</b>、在<b>人耳处</b>；声音强弱用分贝（dB）表示。'],
+    formulas: [{ n: '回声测距', f: 's = v t / 2', u: 's：m　v：m/s　t：s（来回时间）' }],
+    sim: null,
+    qs: [
+      C('“闻其声而知其人”主要是根据声音的', ['音色', '音调', '响度', '频率'], '不同的人声带结构不同，发出声音的<b>音色</b>不同。'),
+      C('用大小不同的力敲同一面鼓，改变的是声音的', ['响度', '音调', '音色', '声速'], '力越大，鼓面振幅越大，<b>响度</b>越大。'),
+      T('声音可以在真空中传播。', false, '声音的传播需要介质，<b>真空不能传声</b>（宇航员在太空要用无线电交谈）。'),
+      C('声音在下列哪种介质中传播最快？', ['钢铁', '水', '空气', '真空'], '一般情况下 v固 > v液 > v气，真空不能传声。'),
+      C('学校附近禁止鸣笛，这是在哪里减弱噪声？', ['声源处', '传播过程中', '人耳处', '以上都不是'], '禁止鸣笛是不让声源发声，属于在<b>声源处</b>减弱噪声。'),
+      C('医院用 B 超检查身体，利用了声音能够', ['传递信息', '传递能量', '在真空中传播', '产生次声波'], 'B 超利用超声波获得人体内部的<b>信息</b>；超声波清洗眼镜才是利用能量。'),
+      N('对着山崖大喊，2 s 后听到回声，人与山崖的距离是多少？（声速取 340 m/s）', 340, 'm', '声音来回共 2 s，单程 1 s：s = vt/2 = 340 m/s × 2 s ÷ 2 = 340 m。'),
+      C('人耳能听到的声音频率范围是', ['20 Hz～20000 Hz', '0～20 Hz', '20000 Hz 以上', '1 Hz～100 Hz'], '低于 20 Hz 是次声波，高于 20000 Hz 是超声波，人耳都听不到。'),
+      C('往暖水瓶里灌水，听到声音的音调越来越高，主要是因为', ['瓶内空气柱越来越短，振动频率变高', '水的振动越来越快', '瓶子的振动越来越慢', '声音的响度越来越大'], '发声的是瓶内的<b>空气柱</b>，水越多空气柱越短，频率越高，音调越高。'),
+      C('“震耳欲聋”描述的是声音的', ['响度大', '音调高', '音色好', '频率高'], '“震耳欲聋”是说声音很<b>大</b>，指响度。'),
+      T('正在发声的物体一定在振动。', true, '声音是由物体的振动产生的。'),
+    ] },
+  { id: 'state', grade: '8a', emoji: '🧊', name: '物态变化',
+    points: ['温度计根据液体<b>热胀冷缩</b>制成；标准大气压下冰水混合物是 0 ℃，沸水是 100 ℃。',
+      '体温计量程 35～42 ℃，分度值 <b>0.1 ℃</b>，可以离开人体读数，使用前要甩一甩。',
+      '吸热：<b>熔化</b>（固→液）、<b>汽化</b>（液→气）、<b>升华</b>（固→气）。',
+      '放热：<b>凝固</b>（液→固）、<b>液化</b>（气→液）、<b>凝华</b>（气→固）。',
+      '<b>晶体</b>有固定熔点，熔化时吸热温度不变（冰、海波、金属）；非晶体没有（松香、玻璃、沥青）。',
+      '沸腾：达到沸点、继续吸热，温度不变。加快蒸发：提高温度、增大表面积、加快表面空气流动。'],
+    formulas: [],
+    sim: null,
+    qs: [
+      C('冬天窗户玻璃内表面出现的“冰花”属于', ['凝华', '凝固', '液化', '升华'], '室内水蒸气遇到冰冷的玻璃，<b>直接变成</b>小冰晶，气→固是凝华。'),
+      C('夏天从冰箱里取出的饮料瓶，外壁会“出汗”，这属于', ['液化', '汽化', '熔化', '升华'], '空气中的水蒸气遇冷的瓶壁<b>液化</b>成小水珠。'),
+      C('下列过程中需要吸热的是', ['冰雪消融', '露珠形成', '霜的形成', '河水结冰'], '冰雪消融是熔化，吸热；露（液化）、霜（凝华）、结冰（凝固）都放热。'),
+      T('晶体在熔化过程中吸收热量，温度保持不变。', true, '晶体有固定的熔点，熔化过程中持续吸热但温度不变。'),
+      C('烧开水时壶嘴冒出的“白气”是', ['水蒸气液化成的小水珠', '水蒸气', '水汽化形成的', '空气中的小冰晶'], '水蒸气是看不见的，“白气”是水蒸气遇冷<b>液化</b>形成的小水珠。'),
+      C('衣柜里的樟脑丸放久了会变小，发生的物态变化是', ['升华', '熔化', '汽化', '凝华'], '樟脑丸由固态<b>直接变成</b>气态，是升华。'),
+      C('下列做法中，能加快蒸发的是', ['把湿衣服晾在通风向阳处', '把蔬菜装入保鲜袋', '给盛水的杯子加盖', '把湿衣服叠起来放在阴凉处'], '向阳（温度高）、通风（空气流动快）都能加快蒸发。'),
+      C('在标准大气压下，冰水混合物的温度是', ['0 ℃', '100 ℃', '4 ℃', '-10 ℃'], '摄氏温度规定：标准大气压下冰水混合物为 0 ℃，沸水为 100 ℃。'),
+      C('体温计的分度值是', ['0.1 ℃', '1 ℃', '0.5 ℃', '0.01 ℃'], '体温计量程 35～42 ℃，分度值 0.1 ℃。'),
+      T('水沸腾后继续加热，水的温度会不断升高。', false, '沸腾时继续吸热，但温度<b>保持在沸点不变</b>。'),
+      C('下列物质中属于晶体的是', ['冰', '松香', '玻璃', '沥青'], '冰有固定熔点 0 ℃，是晶体；松香、玻璃、沥青是非晶体。'),
+      C('秋天早晨的“雾”是怎样形成的？', ['空气中的水蒸气液化', '水汽化', '冰熔化', '水蒸气凝华'], '夜间气温降低，空气中的水蒸气遇冷<b>液化</b>成小水珠，形成雾。'),
+    ] },
+  { id: 'light', grade: '8a', emoji: '🌈', name: '光现象',
+    points: ['光在<b>同种均匀介质</b>中沿直线传播：影子、小孔成像、日食月食。',
+      '真空中光速 <b>c = 3×10⁸ m/s</b>。',
+      '反射定律：三线共面、两线分居、<b>反射角 = 入射角</b>；光路可逆。镜面反射、漫反射都遵循反射定律。',
+      '平面镜成像：<b>正立、等大、虚像</b>，像距 = 物距，像与物关于镜面对称。',
+      '光从空气<b>斜射</b>入水或玻璃，折射角 < 入射角；垂直射入时传播方向不变。',
+      '白光由七色光组成（色散）；色光三原色：<b>红、绿、蓝</b>；红外线（遥控器、热效应）、紫外线（验钞、杀菌）。'],
+    formulas: [{ n: '反射定律', f: '∠反射角 = ∠入射角', u: '入射角：入射光线与法线的夹角' }],
+    sim: 'light',
+    qs: [
+      C('下列现象中，由光的直线传播形成的是', ['小孔成像', '水中倒影', '海市蜃楼', '雨后彩虹'], '小孔成像是直线传播；倒影是反射；海市蜃楼是折射；彩虹是色散。'),
+      N('一束光与平面镜的夹角是 30°，反射角是多少度？', 60, '°', '入射角是光线与<b>法线</b>的夹角：90° − 30° = 60°，反射角 = 入射角 = 60°。'),
+      C('人站在平面镜前 2 m 处，他在镜中的像与他之间的距离是', ['4 m', '2 m', '1 m', '8 m'], '像距 = 物距 = 2 m，像与人相距 2 m + 2 m = 4 m。'),
+      C('人走近平面镜时，镜中的像', ['大小不变', '变大', '变小', '先变大后变小'], '平面镜成<b>等大</b>的像，像的大小只与物体大小有关（看起来变大是视角变大）。'),
+      C('插入水中的筷子看起来在水面处“折断”了，这是光的', ['折射', '反射', '直线传播', '色散'], '水中筷子反射的光从水斜射入空气时发生<b>折射</b>。'),
+      C('光从空气斜射入水中时，折射角', ['小于入射角', '大于入射角', '等于入射角', '等于 0°'], '光从空气斜射入水或玻璃中时，折射光线<b>靠近法线</b>，折射角小于入射角。'),
+      C('色光的三原色是', ['红、绿、蓝', '红、黄、蓝', '红、绿、黄', '黄、绿、蓝'], '色光三原色是红、绿、蓝（颜料三原色才是红、黄、蓝）。'),
+      C('电视机遥控器利用的是', ['红外线', '紫外线', '超声波', 'X 射线'], '遥控器发出的是<b>红外线</b>。紫外线用于验钞、杀菌。'),
+      T('漫反射不遵循光的反射定律。', false, '镜面反射和漫反射<b>都遵循</b>光的反射定律。'),
+      C('光在真空中的传播速度约为', ['3×10⁸ m/s', '3×10⁵ m/s', '340 m/s', '3×10⁸ km/s'], 'c = 3×10⁸ m/s = 3×10⁵ km/s。340 m/s 是声速。'),
+      C('平面镜所成的像是', ['正立、等大的虚像', '倒立、等大的实像', '正立、放大的虚像', '倒立、缩小的实像'], '平面镜成正立、等大的<b>虚像</b>，不能用光屏承接。'),
+      C('“潭清疑水浅”是因为', ['光从水中斜射入空气时发生折射', '光的反射', '光的直线传播', '光的色散'], '池底反射的光从水斜射入空气发生折射，人看到的是变浅的虚像。'),
+    ] },
+  { id: 'lens', grade: '8a', emoji: '🔍', name: '透镜及其应用',
+    points: ['<b>凸透镜</b>对光有会聚作用，<b>凹透镜</b>对光有发散作用。',
+      'u > 2f：倒立、缩小、实像（f < v < 2f）—— <b>照相机</b>。',
+      'u = 2f：倒立、等大、实像（v = 2f）—— 测焦距。',
+      'f < u < 2f：倒立、放大、实像（v > 2f）—— <b>投影仪</b>。',
+      'u < f：正立、放大、虚像 —— <b>放大镜</b>。口诀：一倍焦距分虚实，二倍焦距分大小；成实像时物近像远像变大。',
+      '<b>近视眼</b>像成在视网膜前，戴凹透镜；<b>远视眼</b>像成在视网膜后，戴凸透镜。'],
+    formulas: [{ n: '成像分界', f: 'u = f 分虚实，u = 2f 分大小', u: 'u：物距　v：像距　f：焦距' }],
+    sim: 'lens',
+    qs: [
+      C('照相机成像的特点是', ['倒立、缩小的实像', '倒立、放大的实像', '正立、放大的虚像', '正立、缩小的虚像'], '照相机：u > 2f，成倒立、缩小的实像。'),
+      C('近视眼应该佩戴', ['凹透镜', '凸透镜', '平面镜', '三棱镜'], '近视眼晶状体太厚，像成在视网膜<b>前方</b>，用发散的凹透镜矫正。'),
+      C('凸透镜焦距为 10 cm，物体放在透镜前 15 cm 处，成', ['倒立、放大的实像', '倒立、缩小的实像', '正立、放大的虚像', '不成像'], 'f < u = 15 cm < 2f，成倒立、放大的实像（投影仪原理）。'),
+      C('用放大镜看邮票时，邮票应放在', ['一倍焦距以内', '一倍焦距和二倍焦距之间', '二倍焦距处', '二倍焦距以外'], 'u < f 时成正立、放大的虚像，这就是放大镜。'),
+      T('凸透镜对光有会聚作用，凹透镜对光有发散作用。', true, '记住：凸会聚、凹发散。'),
+      C('投影仪成像时，物距 u 满足', ['f < u < 2f', 'u > 2f', 'u < f', 'u = f'], '投影仪成倒立、放大的实像，物距在一倍和二倍焦距之间。'),
+      C('物体通过凸透镜成实像时，物体向透镜靠近，像会', ['远离透镜，且变大', '靠近透镜，且变小', '远离透镜，且变小', '位置和大小都不变'], '成实像时“物近像远像变大”。'),
+      C('人眼看物体时，在视网膜上成的是', ['倒立、缩小的实像', '正立、缩小的实像', '倒立、放大的虚像', '正立、放大的虚像'], '眼睛相当于照相机：晶状体是凸透镜，视网膜是光屏。'),
+      N('物体放在凸透镜前 20 cm 处时，成倒立、等大的实像。该凸透镜焦距是多少？', 10, 'cm', 'u = 2f 时成倒立、等大的实像，所以 f = 20 cm ÷ 2 = 10 cm。'),
+      C('远视眼的像成在视网膜的', ['后方，需戴凸透镜矫正', '前方，需戴凹透镜矫正', '后方，需戴凹透镜矫正', '前方，需戴凸透镜矫正'], '远视眼像在视网膜后方，用会聚的凸透镜矫正。'),
+      C('平行于主光轴的光经过凸透镜后', ['会聚于焦点', '仍然平行射出', '反向延长线过焦点', '传播方向不变'], '平行于主光轴的光经凸透镜折射后会聚于焦点 F。'),
+    ] },
+  { id: 'density', grade: '8a', emoji: '⚖️', name: '质量与密度',
+    points: ['质量是物体所含物质的多少，<b>不随形状、状态、位置、温度改变</b>。单位 kg：1 t = 1000 kg，1 kg = 1000 g。',
+      '天平：放水平台 → 游码归零 → 调平衡螺母（<b>指针左偏右调</b>）→ 左物右码，用镊子夹砝码。',
+      '密度是物质的一种特性，与物质种类、状态（和温度）有关，与质量、体积无关。',
+      '<b>1 g/cm³ = 1×10³ kg/m³</b>；水的密度 1.0×10³ kg/m³。',
+      '1 mL = 1 cm³，1 L = 1 dm³ = 1000 cm³ = 10⁻³ m³。',
+      '量筒读数时，视线与<b>凹液面的底部</b>相平。'],
+    formulas: [{ n: '密度', f: 'ρ = m / V', u: 'ρ：kg/m³ 或 g/cm³　m：kg　V：m³' }],
+    sim: null,
+    qs: [
+      C('一块冰熔化成水后，不变的是', ['质量', '体积', '密度', '状态'], '质量不随状态改变；冰化成水，密度变大，体积变小。'),
+      C('水的密度是', ['1.0×10³ kg/m³', '1.0 kg/m³', '1.0×10³ g/cm³', '10 g/cm³'], 'ρ水 = 1.0×10³ kg/m³ = 1.0 g/cm³。'),
+      N('一个铁块质量是 158 g，体积是 20 cm³，它的密度是多少？', 7.9, 'g/cm³', 'ρ = m / V = 158 g ÷ 20 cm³ = 7.9 g/cm³。'),
+      C('调节天平平衡时，指针偏向分度盘左侧，应将平衡螺母向哪边调？', ['右', '左', '都可以', '不用调，直接加砝码'], '“左偏右调，右偏左调”。'),
+      T('宇航员把一块石头从地球带到月球，石头的质量变小了。', false, '质量不随<b>位置</b>改变（受到的重力会变小）。'),
+      C('1 g/cm³ 等于', ['1×10³ kg/m³', '1 kg/m³', '1×10⁻³ kg/m³', '100 kg/m³'], '1 g/cm³ = 10⁻³ kg ÷ 10⁻⁶ m³ = 1×10³ kg/m³。'),
+      N('一个瓶子最多能装 0.5 kg 的水，它的容积是多少？（ρ水 = 1.0 g/cm³）', 500, 'cm³', 'V = m / ρ = 500 g ÷ 1.0 g/cm³ = 500 cm³。'),
+      C('一杯水倒掉一半后，剩下的水', ['质量减半，密度不变', '质量和密度都减半', '质量不变，密度减半', '质量和密度都不变'], '密度是物质的特性，与质量多少无关。'),
+      C('用量筒读数时，视线应', ['与凹液面的底部相平', '与凹液面的顶部相平', '俯视液面', '仰视液面'], '视线与凹液面底部相平；俯视读数偏大，仰视读数偏小。'),
+      C('密度是物质的一种特性，它与', ['物质的种类和状态有关', '质量成正比', '体积成反比', '形状有关'], '同种物质（同状态）密度一定，与质量、体积、形状无关。'),
+      C('1 L 等于', ['1000 cm³', '100 cm³', '1 m³', '10 mL'], '1 L = 1 dm³ = 1000 cm³ = 1000 mL。'),
+    ] },
+
+  /* ===================== 八年级下 ===================== */
+  { id: 'force', grade: '8b', emoji: '💪', name: '力',
+    points: ['力是物体对物体的作用；物体间力的作用是<b>相互的</b>。',
+      '力的作用效果：改变物体的<b>运动状态</b>；使物体发生<b>形变</b>。',
+      '力的三要素：<b>大小、方向、作用点</b>。单位：牛顿（N）。',
+      '弹簧测力计：在弹性限度内，弹簧的伸长量与拉力成<b>正比</b>。',
+      '重力 G = mg，g = 9.8 N/kg（粗略计算取 10 N/kg）；方向<b>竖直向下</b>，作用点是重心。'],
+    formulas: [{ n: '重力', f: 'G = m g', u: 'G：N　m：kg　g = 9.8 N/kg' }],
+    sim: null,
+    qs: [
+      C('重力的方向总是', ['竖直向下', '垂直向下', '垂直于支持面', '指向物体运动方向'], '重力的方向总是<b>竖直向下</b>（不是“垂直向下”）。'),
+      N('质量为 50 kg 的同学受到的重力是多少？（g 取 10 N/kg）', 500, 'N', 'G = mg = 50 kg × 10 N/kg = 500 N。'),
+      C('用手拍桌子，手会感到疼，说明', ['物体间力的作用是相互的', '力能改变物体的形状', '力是维持运动的原因', '手的力比桌子的力大'], '手对桌子施力，桌子也对手施力，力的作用是相互的。'),
+      C('力的三要素是', ['大小、方向、作用点', '大小、方向、单位', '大小、作用点、单位', '方向、作用点、施力物体'], '力的大小、方向、作用点都会影响力的作用效果。'),
+      C('下列现象中，力改变了物体运动状态的是', ['守门员接住飞来的足球', '用力把弹簧拉长', '用力捏橡皮泥', '运动员压弯跳板'], '足球由运动变静止，运动状态改变；其余是使物体发生形变。'),
+      C('弹簧测力计的原理：在弹性限度内，弹簧的伸长量与所受拉力成', ['正比', '反比', '无关', '平方关系'], '弹性限度内，拉力越大，伸长量越大，成正比。'),
+      T('只有相互接触的物体之间才能产生力的作用。', false, '不接触也能有力，例如磁铁吸引铁钉、重力。'),
+      C('力的国际单位是', ['牛顿（N）', '千克（kg）', '焦耳（J）', '帕斯卡（Pa）'], '力的单位是牛顿，简称牛，符号 N。'),
+      N('一个物体受到的重力是 20 N，它的质量是多少？（g 取 10 N/kg）', 2, 'kg', 'm = G / g = 20 N ÷ 10 N/kg = 2 kg。'),
+      C('建筑工人用重垂线检查墙壁是否竖直，利用了', ['重力的方向竖直向下', '重力的大小与质量成正比', '力的作用是相互的', '重心在物体中心'], '重垂线总是竖直的，墙与它平行就说明墙竖直。'),
+      C('推门时，推门把手处比推门轴附近更容易，说明力的作用效果与力的', ['作用点有关', '大小有关', '方向有关', '单位有关'], '同样大小、方向的力，作用点不同，效果不同。'),
+    ] },
+  { id: 'newton', grade: '8b', emoji: '🛹', name: '运动和力',
+    points: ['<b>牛顿第一定律</b>：一切物体在没有受到力的作用时，总保持静止状态或匀速直线运动状态。',
+      '<b>惯性</b>：一切物体都有，大小只与<b>质量</b>有关；惯性不是力，不能说“受到惯性作用”。',
+      '力是<b>改变</b>物体运动状态的原因，不是维持运动的原因。',
+      '二力平衡：<b>同物、等大、反向、共线</b>；平衡状态是静止或匀速直线运动。',
+      '滑动摩擦力与<b>压力大小</b>、<b>接触面粗糙程度</b>有关，与接触面积、速度无关。',
+      '增大摩擦：增大压力、使接触面更粗糙；减小摩擦：加润滑油、变滑动为滚动、使接触面分离。'],
+    formulas: [{ n: '二力平衡', f: 'F₁ = F₂（方向相反）', u: '匀速直线运动时：拉力 = 摩擦力' }],
+    sim: null,
+    qs: [
+      C('关于惯性，下列说法正确的是', ['一切物体在任何情况下都有惯性', '物体运动越快，惯性越大', '只有运动的物体才有惯性', '物体受到惯性力的作用'], '惯性是物体本身的属性，只与质量有关，与速度、是否运动无关。'),
+      C('汽车急刹车时，乘客身体向前倾，是因为', ['乘客具有惯性', '乘客受到向前的力', '汽车具有惯性', '乘客受到惯性的作用'], '脚随车停下，上身由于<b>惯性</b>保持原来的运动状态，所以前倾。'),
+      C('书静止在水平桌面上，下列属于一对平衡力的是', ['书受到的重力和桌面对书的支持力', '书对桌面的压力和桌面对书的支持力', '书受到的重力和书对桌面的压力', '桌子受到的重力和书受到的重力'], '平衡力作用在<b>同一物体</b>上；压力和支持力是一对相互作用力。'),
+      C('用 10 N 的水平推力推着箱子在水平地面上做匀速直线运动，箱子受到的摩擦力是', ['10 N', '大于 10 N', '小于 10 N', '0 N'], '匀速直线运动是平衡状态，摩擦力与推力二力平衡，等于 10 N。'),
+      T('力是维持物体运动的原因。', false, '力是<b>改变</b>物体运动状态的原因，物体运动不需要力来维持。'),
+      C('下列做法中，为了增大摩擦的是', ['鞋底刻有花纹', '给自行车链条加润滑油', '行李箱下装轮子', '磁悬浮列车悬浮行驶'], '花纹使接触面更粗糙，增大摩擦；其余都是减小摩擦。'),
+      C('滑动摩擦力的大小与下列哪个因素有关？', ['接触面的粗糙程度', '接触面积的大小', '运动速度的大小', '物体的体积'], '滑动摩擦力只与压力大小和接触面粗糙程度有关。'),
+      C('如果正在运动的物体所受的外力全部消失，物体将', ['做匀速直线运动', '立即停止', '慢慢停下来', '改变运动方向'], '根据牛顿第一定律，物体将保持外力消失时的速度做匀速直线运动。'),
+      C('牛顿第一定律是', ['在实验基础上经推理概括得出的', '直接通过实验得出的', '凭空想象出来的', '由数学计算推导出来的'], '不受力的情况无法实现，所以它是在实验基础上<b>推理</b>得出的。'),
+      N('用 20 N 的水平力推静止在地面上的桌子，没推动，桌子受到的摩擦力是多少？', 20, 'N', '没推动 → 静止 → 平衡状态，静摩擦力 = 推力 = 20 N。'),
+      T('静止的物体一定不受力。', false, '静止的物体可能受到<b>平衡力</b>，比如桌上的书受重力和支持力。'),
+    ] },
+  { id: 'pressure', grade: '8b', emoji: '🎈', name: '压强',
+    points: ['压强 p = F / S，单位帕斯卡（Pa），1 Pa = 1 N/m²。',
+      '增大压强：增大压力或减小受力面积；减小压强：减小压力或增大受力面积。',
+      '液体压强 p = ρgh：随<b>深度</b>增加而增大，同一深度各方向相等，还与<b>液体密度</b>有关。',
+      '<b>连通器</b>：船闸、茶壶、锅炉水位计、下水道 U 形管。',
+      '马德堡半球实验证明大气压存在；<b>托里拆利实验</b>测出大气压（760 mm 水银柱）；1 标准大气压 ≈ 1.013×10⁵ Pa。',
+      '海拔越高气压越低，气压越低沸点越低；<b>流速越大的位置压强越小</b>（飞机升力）。'],
+    formulas: [{ n: '压强', f: 'p = F / S', u: 'p：Pa　F：N　S：m²' }, { n: '液体压强', f: 'p = ρ g h', u: 'ρ：kg/m³　h：m（深度）' }],
+    sim: null,
+    qs: [
+      N('重 600 N 的人双脚站立，与地面的总接触面积是 0.04 m²，他对地面的压强是多少？', 15000, 'Pa', 'p = F / S = 600 N ÷ 0.04 m² = 15000 Pa（1.5×10⁴ Pa）。'),
+      C('下列做法中，为了减小压强的是', ['书包带做得较宽', '刀刃磨得很锋利', '图钉尖做得很尖', '啄木鸟的喙很尖'], '书包带宽是增大受力面积来减小压强；其余都是减小面积增大压强。'),
+      N('水深 2 m 处，水产生的压强是多少？（ρ水 = 1.0×10³ kg/m³，g 取 10 N/kg）', 20000, 'Pa', 'p = ρgh = 1.0×10³ × 10 × 2 Pa = 2×10⁴ Pa。'),
+      C('首先测出大气压值的实验是', ['托里拆利实验', '马德堡半球实验', '帕斯卡裂桶实验', '奥斯特实验'], '马德堡半球实验<b>证明</b>大气压存在，托里拆利实验<b>测出</b>大气压值。'),
+      C('下列不是利用连通器原理的是', ['用注射器吸取药液', '船闸', '茶壶', '锅炉水位计'], '注射器吸药液是利用<b>大气压</b>。'),
+      C('火车站台设置安全线，是因为列车驶过时，人与列车之间的空气', ['流速大、压强小', '流速大、压强大', '流速小、压强小', '流速小、压强大'], '流速越大压强越小，人外侧压强大，会被“推”向列车。'),
+      C('在高原上用普通锅煮饭不易煮熟，原因是', ['气压低，水的沸点低', '气压高，水的沸点高', '气压低，水的沸点高', '气压高，水的沸点低'], '海拔高 → 气压低 → 沸点低，所以要用高压锅。'),
+      C('液体内部压强的大小与下列哪个因素有关？', ['液体的深度和密度', '容器的形状', '液体的总质量', '容器的底面积'], 'p = ρgh，只与液体密度和深度有关。'),
+      T('拦河大坝修成上窄下宽，是因为液体压强随深度的增加而增大。', true, '坝底处水最深，压强最大，所以要修得更宽厚。'),
+      C('1 标准大气压约等于', ['1.013×10⁵ Pa', '1.013×10³ Pa', '760 Pa', '76 Pa'], '1 标准大气压 ≈ 1.013×10⁵ Pa，相当于 760 mm 高的水银柱产生的压强。'),
+      C('用吸管喝饮料时，饮料是被什么“压”进嘴里的？', ['大气压', '嘴的吸力', '饮料的重力', '吸管的弹力'], '吸走管内空气，管内气压变小，外界<b>大气压</b>把饮料压进嘴里。'),
+    ] },
+  { id: 'buoy', grade: '8b', emoji: '🚢', name: '浮力',
+    points: ['浮力的方向<b>竖直向上</b>；称重法：F浮 = G − F示。',
+      '<b>阿基米德原理</b>：F浮 = G排 = ρ液 g V排。浮力只与液体密度和排开液体的体积有关。',
+      '浸没时：ρ物 < ρ液 上浮（最终漂浮），ρ物 = ρ液 悬浮，ρ物 > ρ液 下沉。',
+      '漂浮和悬浮时：<b>F浮 = G物</b>。',
+      '应用：轮船（空心，增大 V排）；潜水艇（改变<b>自身重力</b>）；气球飞艇（充密度小于空气的气体）；密度计（漂浮）。'],
+    formulas: [{ n: '阿基米德原理', f: 'F浮 = ρ液 g V排', u: 'F浮：N　ρ液：kg/m³　V排：m³' }, { n: '称重法', f: 'F浮 = G − F示', u: 'F示：弹簧测力计示数' }],
+    sim: 'buoy',
+    qs: [
+      N('弹簧测力计测得石块重 5 N，浸没在水中时示数为 3 N，石块受到的浮力是多少？', 2, 'N', '称重法：F浮 = G − F示 = 5 N − 3 N = 2 N。'),
+      C('浮力的方向总是', ['竖直向上', '竖直向下', '垂直向上', '与重力方向相同'], '浮力方向竖直向上，与重力方向相反。'),
+      N('体积为 100 cm³ 的铁块浸没在水中，受到的浮力是多少？（g 取 10 N/kg）', 1, 'N', 'V排 = 100 cm³ = 1×10⁻⁴ m³，F浮 = ρ水gV排 = 1.0×10³ × 10 × 10⁻⁴ N = 1 N。'),
+      C('潜水艇是靠改变什么来实现上浮和下沉的？', ['自身的重力', '受到的浮力', '自身的体积', '水的密度'], '潜水艇浸没后浮力不变，靠水舱充水、排水改变<b>自身重力</b>。'),
+      C('一艘轮船从河里驶入海里，它受到的浮力', ['不变', '变大', '变小', '先变大后变小'], '轮船始终漂浮，F浮 = G船 不变；海水密度大，船会浮起一些。'),
+      C('物体浸没在液体中，若 ρ物 < ρ液，物体会', ['上浮，最终漂浮', '下沉', '悬浮', '先下沉后上浮'], 'ρ物 < ρ液 时 F浮 > G，物体上浮，最终漂浮在液面上。'),
+      T('物体浸没在水中后，越往深处，受到的浮力越大。', false, '浸没后 V排 不变，浮力与深度<b>无关</b>。'),
+      C('浮力的大小与下列哪些因素有关？', ['液体的密度和排开液体的体积', '物体的密度', '物体浸没的深度', '物体的形状'], 'F浮 = ρ液gV排。'),
+      C('同一支密度计漂浮在不同液体中，它在密度较大的液体中', ['浸入的体积较小', '浸入的体积较大', '受到的浮力较大', '受到的浮力较小'], '浮力都等于重力不变，ρ液 越大 V排 越小，所以密度计刻度“上小下大”。'),
+      N('一个漂浮在水面上的木块重 6 N，它受到的浮力是多少？', 6, 'N', '漂浮时 F浮 = G = 6 N。'),
+      C('钢铁做的轮船能浮在水面上，是因为', ['做成空心的，增大了排开水的体积', '钢铁的密度比水小', '轮船受到的重力为零', '水对船底没有压强'], '空心可以排开更多的水，从而获得足够大的浮力。'),
+    ] },
+  { id: 'work', grade: '8b', emoji: '🏋️', name: '功和机械能',
+    points: ['做功的两个必要因素：作用在物体上的<b>力</b>；物体在<b>力的方向上</b>移动的距离。',
+      '三种不做功：有力无距离（推而未动）、有距离无力（惯性滑行）、力与距离垂直（提水桶水平走）。',
+      '功 W = Fs，单位焦耳（J）；功率 P = W / t，表示做功<b>快慢</b>，单位瓦特（W），1 kW = 1000 W。',
+      '推导：P = Fv（功率一定时，速度越小牵引力越大）。',
+      '动能与<b>质量、速度</b>有关；重力势能与<b>质量、高度</b>有关；弹性势能与弹性形变程度有关。',
+      '机械能 = 动能 + 势能；只有动能和势能相互转化时，机械能守恒。'],
+    formulas: [{ n: '功', f: 'W = F s', u: 'W：J　F：N　s：m' }, { n: '功率', f: 'P = W / t', u: 'P：W　W：J　t：s' }, { n: '功率推导式', f: 'P = F v', u: 'v：m/s' }],
+    sim: null,
+    qs: [
+      C('下列情况中，人对物体做了功的是', ['把书从地上捡起来', '提着水桶在水平路面上匀速前进', '用力推车但没有推动', '举着杠铃静止不动'], '捡书时有向上的力，书也向上移动了距离。其余三项：力与距离垂直、无距离、无距离。'),
+      N('用 50 N 的水平推力推着箱子在水平地面上前进 10 m，推力做的功是多少？', 500, 'J', 'W = Fs = 50 N × 10 m = 500 J。'),
+      N('一台机器 10 s 内做功 2000 J，它的功率是多少？', 200, 'W', 'P = W / t = 2000 J ÷ 10 s = 200 W。'),
+      C('影响动能大小的因素是', ['质量和速度', '质量和高度', '速度和高度', '弹性形变程度'], '动能与质量、速度有关；重力势能才与质量、高度有关。'),
+      C('滚摆下降的过程中（不计空气阻力），能量是怎样转化的？', ['重力势能转化为动能', '动能转化为重力势能', '动能转化为弹性势能', '机械能转化为内能'], '高度降低、速度变大：重力势能 → 动能。'),
+      C('功率是表示', ['做功快慢的物理量', '做功多少的物理量', '能量多少的物理量', '力大小的物理量'], '功率大 = 做功快，不一定做功多。'),
+      T('匀速上升的电梯里的人，动能不变，重力势能增大，机械能增大。', true, '速度不变 → 动能不变；高度增加 → 重力势能增大；所以机械能增大。'),
+      C('人造地球卫星从近地点向远地点运动时', ['动能减小，势能增大', '动能增大，势能减小', '动能和势能都增大', '动能和势能都减小'], '远离地球，高度增大，速度减小：动能转化为势能。'),
+      C('功的国际单位是', ['焦耳（J）', '瓦特（W）', '牛顿（N）', '帕斯卡（Pa）'], '功和能的单位都是焦耳 J；瓦特是功率单位。'),
+      N('重 500 N 的同学从一楼走到三楼，上升高度 6 m，他克服重力做功多少？', 3000, 'J', 'W = Gh = 500 N × 6 m = 3000 J。'),
+      C('汽车上坡时，司机通常换用低速挡，这是为了', ['在功率一定时增大牵引力', '增大发动机功率', '节省燃油', '增大汽车的惯性'], 'P = Fv，功率一定时，速度越小，牵引力越大。'),
+    ] },
+  { id: 'machine', grade: '8b', emoji: '🔧', name: '简单机械',
+    points: ['杠杆五要素：支点、动力、阻力、动力臂、阻力臂。<b>力臂是支点到力的作用线的距离</b>。',
+      '杠杆平衡条件：<b>F₁L₁ = F₂L₂</b>。',
+      '省力杠杆 L₁ > L₂（撬棒、钢丝钳、开瓶器），省力但费距离；费力杠杆 L₁ < L₂（镊子、钓鱼竿、筷子）；等臂杠杆（天平）。',
+      '定滑轮：能改变力的方向，不省力；动滑轮：省一半力，但不能改变方向、费距离。',
+      '滑轮组：F = (G物 + G动) / n，绳子自由端移动距离 s = nh。',
+      '机械效率 η = W有 / W总 × 100%，总小于 100%；使用任何机械都<b>不省功</b>。'],
+    formulas: [{ n: '杠杆平衡条件', f: 'F₁ L₁ = F₂ L₂', u: 'F：N　L：m' }, { n: '滑轮组', f: 'F = (G物 + G动) / n，s = n h', u: 'n：承担物重的绳子段数' }, { n: '机械效率', f: 'η = W有 / W总 × 100%', u: 'W有 = Gh，W总 = Fs' }],
+    sim: 'lever',
+    qs: [
+      C('下列工具中属于费力杠杆的是', ['镊子', '撬棒', '钢丝钳', '开瓶器'], '镊子的动力臂小于阻力臂，是费力杠杆（但省距离）。'),
+      N('杠杆平衡时，动力臂 0.6 m，阻力臂 0.2 m，阻力 300 N，动力是多少？', 100, 'N', 'F₁ = F₂L₂ / L₁ = 300 N × 0.2 m ÷ 0.6 m = 100 N。'),
+      C('使用定滑轮的好处是', ['可以改变力的方向', '可以省力', '可以省距离', '可以省功'], '定滑轮实质是等臂杠杆，不省力，但可以改变力的方向。'),
+      C('使用任何机械都', ['不能省功', '能省功', '能省力', '能省距离'], '省力必然费距离，省距离必然费力，任何机械都不省功。'),
+      N('用一个动滑轮匀速提起 200 N 的物体（不计滑轮重和摩擦），拉力是多少？', 100, 'N', '动滑轮省一半的力：F = G / 2 = 100 N。'),
+      N('用滑轮组提升重物，有用功 800 J，总功 1000 J，机械效率是多少？', 80, '%', 'η = W有 / W总 = 800 J ÷ 1000 J × 100% = 80%。'),
+      T('机械效率可以达到 100%。', false, '总有额外功（摩擦、机械自重），机械效率总<b>小于</b> 100%。'),
+      C('力臂是指', ['支点到力的作用线的距离', '支点到力的作用点的距离', '动力作用点到阻力作用点的距离', '杠杆的长度'], '力臂是支点到力的<b>作用线</b>的垂直距离。'),
+      N('滑轮组由 3 段绳子承担物重，物体上升 2 m，绳子自由端移动多少？', 6, 'm', 's = nh = 3 × 2 m = 6 m。'),
+      C('天平属于', ['等臂杠杆', '省力杠杆', '费力杠杆', '滑轮'], '天平横梁两边力臂相等，是等臂杠杆。'),
+      C('提高滑轮组机械效率的方法是', ['增加所提物体的重力', '增加动滑轮的个数', '增大物体提升的高度', '加快提升的速度'], '额外功不变时，有用功越大效率越高；动滑轮越多额外功越大，效率越低。'),
+    ] },
+
+  /* ===================== 九年级 ===================== */
+  { id: 'heat', grade: '9', emoji: '🔥', name: '内能与热机',
+    points: ['分子在永不停息地做<b>无规则运动</b>（扩散现象），温度越高越剧烈；分子间同时存在<b>引力和斥力</b>。',
+      '<b>一切物体都有内能</b>；同一物体温度升高，内能增大。',
+      '改变内能的两种方式：<b>做功</b>（搓手、压缩空气）和<b>热传递</b>（晒太阳、热水袋）。',
+      '水的比热容大：c水 = 4.2×10³ J/(kg·℃)，所以沿海昼夜温差小、用水作冷却剂。',
+      '汽油机四冲程：吸气、<b>压缩</b>（机械能→内能）、<b>做功</b>（内能→机械能）、排气。',
+      '热值只与燃料种类有关；<b>能量守恒定律</b>：能量既不会凭空消灭，也不会凭空产生，只会转化或转移。'],
+    formulas: [{ n: '吸放热', f: 'Q = c m Δt', u: 'Q：J　c：J/(kg·℃)　m：kg　Δt：℃' }, { n: '燃料放热', f: 'Q放 = m q', u: 'q：J/kg（热值）' }, { n: '热机效率', f: 'η = W有用 / Q放 × 100%', u: '' }],
+    sim: null,
+    qs: [
+      C('“花香扑鼻”说明', ['分子在不停地做无规则运动', '分子间有引力', '分子间有斥力', '分子很小'], '花香分子扩散到空气中，说明分子在不停地做无规则运动。'),
+      C('汽油机的四个冲程中，将内能转化为机械能的是', ['做功冲程', '压缩冲程', '吸气冲程', '排气冲程'], '做功冲程：燃气推动活塞，内能 → 机械能。'),
+      C('质量 2 kg 的水温度升高 10 ℃，吸收的热量是多少？（c水 = 4.2×10³ J/(kg·℃)）', ['8.4×10⁴ J', '4.2×10⁴ J', '8.4×10³ J', '2.1×10⁴ J'], 'Q = cmΔt = 4.2×10³ × 2 × 10 J = 8.4×10⁴ J。'),
+      C('沿海地区昼夜温差比内陆小，主要是因为水的', ['比热容大', '密度大', '热值大', '沸点高'], '水的比热容大，吸收或放出相同热量时温度变化小。'),
+      C('下列通过做功改变物体内能的是', ['搓手取暖', '用热水袋暖手', '晒太阳取暖', '用火炉烧水'], '搓手是克服摩擦做功；其余三项是热传递。'),
+      T('0 ℃ 的冰没有内能。', false, '<b>一切物体</b>都有内能，分子总在运动。'),
+      C('完全燃烧 0.5 kg 干木柴（q = 1.2×10⁷ J/kg），放出的热量是', ['6×10⁶ J', '2.4×10⁷ J', '1.2×10⁷ J', '6×10⁵ J'], 'Q = mq = 0.5 kg × 1.2×10⁷ J/kg = 6×10⁶ J。'),
+      C('汽油机压缩冲程中的能量转化是', ['机械能转化为内能', '内能转化为机械能', '化学能转化为内能', '内能转化为化学能'], '活塞压缩气体做功，机械能 → 内能，气体温度升高。'),
+      C('热值是燃料的一种特性，它只与', ['燃料的种类有关', '燃料的质量有关', '燃烧是否充分有关', '放出热量的多少有关'], '同种燃料热值相同，与质量、是否完全燃烧无关。'),
+      T('同一物体温度升高，内能一定增加。', true, '温度升高，分子运动加剧，分子动能增大，内能增加。'),
+      C('固体和液体很难被压缩，说明分子间存在', ['斥力', '引力', '间隙', '无规则运动'], '分子间距离被压小时，斥力起主要作用。'),
+      C('能量守恒定律告诉我们，能量', ['既不会凭空消灭也不会凭空产生，只会转化或转移', '可以凭空产生', '会越用越少直到消失', '只能转移，不能转化'], '能量在转化和转移过程中总量保持不变。'),
+    ] },
+  { id: 'circuit', grade: '9', emoji: '🔌', name: '电流和电路',
+    points: ['摩擦起电的实质是<b>电子的转移</b>；丝绸摩擦的玻璃棒带正电，毛皮摩擦的橡胶棒带负电。',
+      '同种电荷相互<b>排斥</b>，异种电荷相互<b>吸引</b>；验电器利用同种电荷相互排斥。',
+      '规定<b>正电荷</b>定向移动的方向为电流方向；电源外部，电流从正极流向负极。',
+      '导体：金属、人体、大地、石墨、酸碱盐溶液；绝缘体：橡胶、玻璃、塑料、陶瓷。',
+      '串联：电流只有一条路径，<b>I = I₁ = I₂</b>；并联：<b>I = I₁ + I₂</b>。',
+      '电流表要<b>串联</b>，电流“正进负出”，绝不能直接接在电源两极。1 A = 1000 mA。'],
+    formulas: [{ n: '串联电流', f: 'I = I₁ = I₂', u: 'I：A' }, { n: '并联电流', f: 'I = I₁ + I₂', u: '干路电流等于各支路电流之和' }],
+    sim: 'ohm',
+    qs: [
+      C('用丝绸摩擦过的玻璃棒带', ['正电', '负电', '不带电', '可能带正电也可能带负电'], '玻璃棒失去电子带正电；毛皮摩擦过的橡胶棒带负电。'),
+      C('验电器的工作原理是', ['同种电荷相互排斥', '异种电荷相互吸引', '带电体能吸引轻小物体', '电荷的定向移动'], '金属箔带上同种电荷，相互排斥而张开。'),
+      C('下列物体中，通常情况下属于导体的是', ['铅笔芯', '塑料尺', '橡皮', '玻璃杯'], '铅笔芯是石墨，是导体。'),
+      C('物理学中规定电流的方向是', ['正电荷定向移动的方向', '负电荷定向移动的方向', '电子定向移动的方向', '从电源负极经用电器到正极'], '规定正电荷定向移动方向为电流方向，与电子实际移动方向相反。'),
+      C('串联电路中，各处的电流', ['都相等', '越靠近正极越大', '越靠近负极越大', '不一定相等'], '串联电路电流只有一条路径，处处相等。'),
+      N('并联电路中，干路电流 1.2 A，一条支路电流 0.5 A，另一条支路的电流是多少？', 0.7, 'A', 'I₂ = I − I₁ = 1.2 A − 0.5 A = 0.7 A。'),
+      C('使用电流表时，下列做法正确的是', ['让电流从“+”接线柱流入', '把电流表与用电器并联', '把电流表直接接在电源两极上', '不试触，直接用小量程'], '电流表要串联、正进负出，并先用大量程试触。'),
+      T('家里的电灯、电视机等用电器是串联的。', false, '家用电器互不影响、都在 220 V 下工作，是<b>并联</b>的。'),
+      C('用导线直接把电源正负极连接起来，这种情况叫', ['短路', '断路', '通路', '串联电路'], '电源短路电流非常大，会烧坏电源，绝对不允许。'),
+      C('摩擦起电的实质是', ['电子从一个物体转移到另一个物体', '创造了电荷', '质子发生了转移', '原子核发生了转移'], '摩擦起电没有创造电荷，只是<b>电子</b>发生了转移。'),
+      C('0.3 A 等于', ['300 mA', '30 mA', '3000 mA', '3 mA'], '1 A = 1000 mA，0.3 A = 300 mA。'),
+    ] },
+  { id: 'voltage', grade: '9', emoji: '🔋', name: '电压 电阻',
+    points: ['电压使电路中形成电流，单位伏特（V）。一节干电池 <b>1.5 V</b>，家庭电路 <b>220 V</b>，安全电压<b>不高于 36 V</b>。',
+      '电压表要<b>并联</b>，正进负出，可以直接接在电源两极测电源电压。',
+      '串联：<b>U = U₁ + U₂</b>；并联：<b>U = U₁ = U₂</b>。',
+      '电阻表示导体对电流的阻碍作用，单位欧姆（Ω）；与<b>材料、长度、横截面积</b>（和温度）有关，与电压、电流无关。',
+      '同种材料：越长电阻越大，越粗电阻越小。',
+      '滑动变阻器靠改变接入电路的<b>电阻丝长度</b>改变电阻，“一上一下”接法；闭合开关前滑片移到阻值最大处。'],
+    formulas: [{ n: '串联电压', f: 'U = U₁ + U₂', u: 'U：V' }, { n: '并联电压', f: 'U = U₁ = U₂', u: '各支路两端电压相等' }],
+    sim: 'ohm',
+    qs: [
+      C('一节新干电池的电压是', ['1.5 V', '2 V', '220 V', '36 V'], '一节干电池 1.5 V；一节铅蓄电池 2 V。'),
+      C('我国家庭电路的电压是', ['220 V', '110 V', '36 V', '380 V'], '我国家庭电路电压为 220 V。'),
+      C('电压表在电路中应', ['与被测用电器并联', '与被测用电器串联', '只接在用电器的一端', '只能接在电源两极'], '电压表并联在被测用电器两端。'),
+      N('两灯串联在 6 V 的电源上，L₁ 两端电压是 2.5 V，L₂ 两端电压是多少？', 3.5, 'V', '串联电路 U = U₁ + U₂，U₂ = 6 V − 2.5 V = 3.5 V。'),
+      C('导体的电阻与下列哪个因素无关？', ['导体两端的电压', '导体的材料', '导体的长度', '导体的横截面积'], '电阻是导体本身的性质，与电压、电流无关。'),
+      C('滑动变阻器是通过改变什么来改变电阻的？', ['接入电路中电阻丝的长度', '电阻丝的横截面积', '电阻丝的材料', '电阻丝的温度'], '滑片移动改变了接入电路的电阻丝<b>长度</b>。'),
+      T('并联电路中，各支路两端的电压相等。', true, '并联电路 U = U₁ = U₂。'),
+      C('材料和横截面积相同的两根导线，长度越长，电阻', ['越大', '越小', '不变', '无法确定'], '同种材料、同样粗细，越长电阻越大。'),
+      C('闭合开关前，滑动变阻器的滑片应置于', ['阻值最大处', '阻值最小处', '中间位置', '任意位置'], '阻值最大可以使电流最小，保护电路。'),
+      C('对人体来说，安全电压是', ['不高于 36 V', '不高于 220 V', '恰好等于 36 V', '高于 36 V'], '对人体的安全电压不高于 36 V。'),
+      C('电阻的国际单位是', ['欧姆（Ω）', '伏特（V）', '安培（A）', '瓦特（W）'], '电阻单位欧姆，符号 Ω；1 kΩ = 1000 Ω。'),
+    ] },
+  { id: 'ohm', grade: '9', emoji: '⚡', name: '欧姆定律',
+    points: ['<b>欧姆定律</b>：I = U / R。电阻一定时，电流与电压成正比；电压一定时，电流与电阻成反比。',
+      '伏安法测电阻：R = U / I，用电压表测 U、电流表测 I，滑动变阻器改变电压多次测量。',
+      '串联：R = R₁ + R₂；<b>分压</b>：U₁ : U₂ = R₁ : R₂。',
+      '并联：1/R = 1/R₁ + 1/R₂；<b>分流</b>：I₁ : I₂ = R₂ : R₁。',
+      '电阻是导体本身的性质，不能说“电阻与电压成正比”。'],
+    formulas: [{ n: '欧姆定律', f: 'I = U / R', u: 'I：A　U：V　R：Ω' }, { n: '串联电阻', f: 'R = R₁ + R₂', u: '' }, { n: '并联电阻', f: '1/R = 1/R₁ + 1/R₂', u: '两个电阻：R = R₁R₂ / (R₁ + R₂)' }],
+    sim: 'ohm',
+    qs: [
+      N('某导体两端电压 6 V，通过的电流 0.3 A，它的电阻是多少？', 20, 'Ω', 'R = U / I = 6 V ÷ 0.3 A = 20 Ω。'),
+      N('10 Ω 的电阻两端加 3 V 电压，通过它的电流是多少？', 0.3, 'A', 'I = U / R = 3 V ÷ 10 Ω = 0.3 A。'),
+      N('5 Ω 和 10 Ω 的电阻串联，总电阻是多少？', 15, 'Ω', '串联 R = R₁ + R₂ = 5 Ω + 10 Ω = 15 Ω。'),
+      N('两个 10 Ω 的电阻并联，总电阻是多少？', 5, 'Ω', 'R = R₁R₂ / (R₁ + R₂) = 100 / 20 Ω = 5 Ω（并联后比任何一个都小）。'),
+      T('由 R = U / I 可知，导体的电阻与电压成正比，与电流成反比。', false, '电阻是导体本身的性质，R = U/I 只是<b>计算</b>电阻的方法。'),
+      C('电阻一定时，通过导体的电流与导体两端的电压成', ['正比', '反比', '不成比例', '平方关系'], 'I = U / R，R 不变时 I 与 U 成正比。'),
+      C('R₁ = 10 Ω 与 R₂ = 20 Ω 串联，它们两端电压之比 U₁ : U₂ 为', ['1 : 2', '2 : 1', '1 : 1', '1 : 4'], '串联电流相等，U₁ : U₂ = R₁ : R₂ = 1 : 2。'),
+      C('伏安法测电阻的原理是', ['R = U / I', 'P = UI', 'W = UIt', 'Q = I²Rt'], '测出电压和电流，用 R = U / I 算电阻。'),
+      N('电阻 R = 20 Ω，允许通过的最大电流是 0.5 A，它两端最多能加多少电压？', 10, 'V', 'U = IR = 0.5 A × 20 Ω = 10 V。'),
+      C('R₁ = 10 Ω 与 R₂ = 30 Ω 并联，通过它们的电流之比 I₁ : I₂ 为', ['3 : 1', '1 : 3', '1 : 1', '1 : 9'], '并联电压相等，I₁ : I₂ = R₂ : R₁ = 30 : 10 = 3 : 1。'),
+      C('探究电流与电阻的关系时，换上更大的定值电阻后，应调节滑动变阻器使', ['定值电阻两端的电压保持不变', '电路中的电流保持不变', '滑动变阻器两端电压不变', '电源电压变大'], '控制变量法：研究 I 与 R 的关系，要保持<b>电阻两端电压</b>不变。'),
+    ] },
+  { id: 'power', grade: '9', emoji: '💡', name: '电功率',
+    points: ['电能单位：焦耳（J）、千瓦时（kW·h，即“度”），<b>1 kW·h = 3.6×10⁶ J</b>；电能表测量消耗的电能。',
+      '电功 W = UIt；电功率 P = W / t = UI，单位瓦特（W）。',
+      '纯电阻电路推导：P = I²R = U² / R。',
+      '额定电压下的功率叫额定功率；灯泡亮度由<b>实际功率</b>决定。',
+      '<b>焦耳定律</b>：Q = I²Rt；电热水壶、电饭锅利用电流的热效应。'],
+    formulas: [{ n: '电功', f: 'W = U I t', u: 'W：J　U：V　I：A　t：s' }, { n: '电功率', f: 'P = U I', u: 'P：W；也可 P = W / t' }, { n: '电功率推导式', f: 'P = I²R = U²/R', u: '纯电阻电路' }, { n: '焦耳定律', f: 'Q = I² R t', u: 'Q：J' }],
+    sim: null,
+    qs: [
+      C('1 kW·h 等于', ['3.6×10⁶ J', '3.6×10³ J', '1000 J', '3600 J'], '1 kW·h = 1000 W × 3600 s = 3.6×10⁶ J。'),
+      N('额定功率 1000 W 的电饭锅正常工作 0.5 h，消耗多少电能？', 0.5, 'kW·h', 'W = Pt = 1 kW × 0.5 h = 0.5 kW·h（0.5 度）。'),
+      N('灯泡两端电压 220 V，通过的电流 0.5 A，它的电功率是多少？', 110, 'W', 'P = UI = 220 V × 0.5 A = 110 W。'),
+      C('灯泡的亮暗由什么决定？', ['实际功率', '额定功率', '额定电压', '通过的电荷量'], '实际功率越大，灯泡越亮。'),
+      N('“220 V 40 W”的灯泡正常发光时，电阻是多少？', 1210, 'Ω', 'R = U² / P = (220 V)² ÷ 40 W = 1210 Ω。'),
+      C('焦耳定律的表达式是', ['Q = I²Rt', 'Q = cmΔt', 'Q = mq', 'W = Fs'], '电流通过导体产生的热量与电流的平方、电阻、通电时间成正比。'),
+      C('下列用电器中，利用电流热效应工作的是', ['电热水壶', '电风扇', '电视机', '洗衣机'], '电热水壶把电能主要转化为内能。'),
+      T('电功率越大的用电器，消耗的电能一定越多。', false, 'W = Pt，消耗电能还与<b>时间</b>有关；电功率大只说明耗电快。'),
+      C('电能表是测量什么的仪表？', ['电能（电功）', '电功率', '电流', '电压'], '电能表测量用电器消耗的电能，单位 kW·h。'),
+      N('电阻为 10 Ω 的电热丝，通过 2 A 的电流，1 min 产生的热量是多少？', 2400, 'J', 'Q = I²Rt = (2 A)² × 10 Ω × 60 s = 2400 J。'),
+      C('“220 V 100 W”的灯泡接在 110 V 的电路中（电阻不变），实际功率为', ['25 W', '50 W', '100 W', '200 W'], 'P = U²/R，电压变为一半，功率变为 1/4：100 W ÷ 4 = 25 W。'),
+    ] },
+  { id: 'safety', grade: '9', emoji: '🏠', name: '生活用电',
+    points: ['家庭电路：进户线（火线、零线）→ 电能表 → 总开关 → 保险装置 → 用电器、插座；各用电器<b>并联</b>。',
+      '火线与零线之间电压 220 V；<b>开关要接在火线</b>与用电器之间。',
+      '试电笔：手接触<b>笔尾金属体</b>，笔尖接触火线时氖管发光。',
+      '三孔插座“<b>左零右火上接地</b>”；有金属外壳的用电器外壳要接地。',
+      '电流过大的原因：<b>短路</b>、<b>用电器总功率过大</b>；保险丝（电阻大、熔点低）或空气开关会切断电路。',
+      '发现有人触电，<b>先切断电源</b>；不靠近高压带电体，不用湿手碰开关。'],
+    formulas: [{ n: '总功率与电流', f: 'I = P总 / U', u: '用电器越多（并联），干路电流越大' }],
+    sim: null,
+    qs: [
+      C('家庭电路中，控制电灯的开关应接在', ['火线和电灯之间', '零线和电灯之间', '地线上', '任意位置都可以'], '开关接在火线上，断开时电灯与火线断开，更换灯泡更安全。'),
+      C('使用试电笔时，下列做法正确的是', ['手接触笔尾金属体', '手接触笔尖金属体', '手不接触任何金属部分', '用试电笔检测高压线'], '手必须接触笔尾金属体，才能构成通路使氖管发光；手不能碰笔尖。'),
+      C('发现有人触电，首先应该', ['立即切断电源', '用手把人拉开', '打电话后等待救援', '用湿木棍挑开电线'], '先切断电源，或用<b>干燥</b>的木棍等绝缘体挑开电线。'),
+      C('家庭电路中电流过大的原因可能是', ['短路或用电器总功率过大', '开关断开', '灯泡灯丝断了', '用电器总功率过小'], '短路或总功率过大都会使干路电流过大。'),
+      C('三孔插座中，上面那个孔接', ['地线', '火线', '零线', '不接线'], '左零右火上接地。'),
+      T('有金属外壳的家用电器，应使用三孔插座，让外壳接地。', true, '外壳接地，万一漏电，电流会导入大地，防止触电。'),
+      T('用湿手拨动开关是安全的。', false, '生活用水是导体，湿手容易触电。'),
+      C('保险丝应选用', ['电阻较大、熔点较低的材料', '电阻较小、熔点较高的材料', '铜丝', '铁丝'], '电流过大时保险丝能迅速发热熔断，所以不能用铜丝、铁丝代替。'),
+      C('正常情况下，试电笔笔尖接触零线时，氖管', ['不发光', '发光', '一直闪烁', '变成红色后熄灭'], '零线与大地之间电压为 0，氖管不发光；接触火线才发光。'),
+      C('下列做法符合安全用电原则的是', ['更换灯泡前先断开电源', '在高压线下放风筝', '用铜丝代替保险丝', '多个大功率用电器同时使用一个插座'], '更换灯泡、维修电器前要先切断电源。'),
+      C('家庭电路中各用电器之间是', ['并联', '串联', '有的串联有的并联', '与开关并联'], '家用电器并联，互不影响，都能在 220 V 下工作。'),
+    ] },
+  { id: 'magnet', grade: '9', emoji: '🧲', name: '电与磁',
+    points: ['磁体有 N、S 两极：<b>同名磁极相互排斥，异名磁极相互吸引</b>。',
+      '磁体外部，磁感线从 <b>N 极</b>出发回到 <b>S 极</b>；地磁北极在地理南极附近。',
+      '<b>奥斯特</b>实验：电流周围存在磁场。通电螺线管用<b>安培定则</b>判断磁极：右手握住螺线管，四指指向电流方向，大拇指所指为 N 极。',
+      '电磁铁磁性强弱与<b>电流大小</b>、<b>线圈匝数</b>有关（有铁芯磁性更强）；电磁继电器用电磁铁控制电路。',
+      '磁场对通电导线有力的作用 → <b>电动机</b>（电能 → 机械能）。',
+      '<b>法拉第</b>发现电磁感应：闭合电路的一部分导体做<b>切割磁感线</b>运动产生感应电流 → <b>发电机</b>（机械能 → 电能）。'],
+    formulas: [{ n: '安培定则', f: '右手握螺线管，四指=电流方向，拇指=N 极', u: '' }],
+    sim: null,
+    qs: [
+      C('首先发现电流周围存在磁场的科学家是', ['奥斯特', '法拉第', '牛顿', '欧姆'], '1820 年，丹麦物理学家奥斯特发现电流的磁效应。'),
+      C('发电机的工作原理是', ['电磁感应', '电流的磁效应', '磁场对通电导线有力的作用', '电流的热效应'], '发电机利用电磁感应，把机械能转化为电能。'),
+      C('电动机工作时的能量转化是', ['电能转化为机械能', '机械能转化为电能', '化学能转化为电能', '内能转化为机械能'], '电动机：通电导线在磁场中受力转动，电能 → 机械能。'),
+      C('磁体外部的磁感线方向是', ['从 N 极出发回到 S 极', '从 S 极出发回到 N 极', '从中间指向两极', '没有方向'], '磁体外部从 N 极到 S 极（内部从 S 到 N，形成闭合曲线）。'),
+      C('要增强电磁铁的磁性，可以', ['增大电流', '减少线圈匝数', '抽出铁芯', '改变电流方向'], '增大电流、增加匝数、插入铁芯都能增强磁性；改变电流方向只改变磁极。'),
+      T('地磁的北极在地理的北极附近。', false, '地磁北极在<b>地理南极</b>附近，所以指南针的 N 极指向地理北方。'),
+      C('判断通电螺线管磁极的方法是', ['安培定则（右手螺旋定则）', '欧姆定律', '焦耳定律', '阿基米德原理'], '右手握住螺线管，四指指向电流方向，大拇指所指为 N 极。'),
+      C('发现电磁感应现象的科学家是', ['法拉第', '奥斯特', '安培', '焦耳'], '1831 年，英国物理学家法拉第发现电磁感应。'),
+      C('两个磁体的同名磁极相互靠近时会', ['相互排斥', '相互吸引', '没有作用', '先吸引后排斥'], '同名磁极相互排斥，异名磁极相互吸引。'),
+      C('产生感应电流的条件：闭合电路的一部分导体在磁场中', ['做切割磁感线运动', '静止不动', '沿磁感线方向运动', '做任意运动'], '必须是闭合电路，且导体做切割磁感线运动。'),
+      C('电磁继电器的核心部件是', ['电磁铁', '永磁体', '电动机', '发电机'], '电磁继电器利用电磁铁吸引衔铁，用低电压、弱电流控制高电压、强电流电路。'),
+    ] },
+  ];
+  CHAPTERS.forEach((ch, ci) => { ch.no = ci + 1; ch.qs.forEach((q, i) => { q.id = ch.id + '-' + i; q.ch = ch.id; }); });
+
+  const GRADES = [
+    { id: '8a', name: '八年级上' },
+    { id: '8b', name: '八年级下' },
+    { id: '9', name: '九年级' },
+  ];
+
+  /* ---------- 公式抢答：公式库（excl：互相冲突、不能做干扰项的） ---------- */
+  const FORMULAS = [
+    { id: 'v', name: '速度', f: 'v = s / t', unit: 'm/s', g: '8a' },
+    { id: 'rho', name: '密度', f: 'ρ = m / V', unit: 'kg/m³', g: '8a' },
+    { id: 'G', name: '重力', f: 'G = m g', unit: 'N', g: '8b' },
+    { id: 'p', name: '压强', f: 'p = F / S', unit: 'Pa', g: '8b', excl: ['pl'] },
+    { id: 'pl', name: '液体压强', f: 'p = ρ g h', unit: 'Pa', g: '8b', excl: ['p'] },
+    { id: 'fa', name: '浮力（阿基米德原理）', f: 'F浮 = ρ液 g V排', unit: 'N', g: '8b', excl: ['fw'] },
+    { id: 'fw', name: '浮力（称重法）', f: 'F浮 = G − F示', unit: 'N', g: '8b', excl: ['fa'] },
+    { id: 'W', name: '功', f: 'W = F s', unit: 'J', g: '8b' },
+    { id: 'P', name: '功率', f: 'P = W / t', unit: 'W', g: '8b', excl: ['Pe'] },
+    { id: 'lev', name: '杠杆平衡条件', f: 'F₁L₁ = F₂L₂', unit: '', g: '8b' },
+    { id: 'eta', name: '机械效率', f: 'η = W有 / W总 × 100%', unit: '', g: '8b' },
+    { id: 'Q', name: '物体吸放热', f: 'Q = c m Δt', unit: 'J', g: '9' },
+    { id: 'Qq', name: '燃料完全燃烧放热', f: 'Q = m q', unit: 'J', g: '9' },
+    { id: 'I', name: '欧姆定律', f: 'I = U / R', unit: 'A', g: '9' },
+    { id: 'Rs', name: '串联电路总电阻', f: 'R = R₁ + R₂', unit: 'Ω', g: '9' },
+    { id: 'We', name: '电功', f: 'W = U I t', unit: 'J', g: '9' },
+    { id: 'Pe', name: '电功率', f: 'P = U I', unit: 'W', g: '9', excl: ['P'] },
+    { id: 'Qj', name: '焦耳定律', f: 'Q = I² R t', unit: 'J', g: '9' },
+  ];
+
+  /* ---------- 单位连连看 & 单位题 ---------- */
+  const UNITS = [
+    { q: '长度', u: 'm', g: '8a' }, { q: '时间', u: 's', g: '8a' }, { q: '速度', u: 'm/s', g: '8a' },
+    { q: '频率', u: 'Hz', g: '8a' }, { q: '声音强弱', u: 'dB', g: '8a' }, { q: '温度', u: '℃', g: '8a' },
+    { q: '质量', u: 'kg', g: '8a' }, { q: '密度', u: 'kg/m³', g: '8a' },
+    { q: '力', u: 'N', g: '8b' }, { q: '压强', u: 'Pa', g: '8b' }, { q: '功', u: 'J', g: '8b' }, { q: '功率', u: 'W', g: '8b' },
+    { q: '比热容', u: 'J/(kg·℃)', g: '9' }, { q: '热值', u: 'J/kg', g: '9' },
+    { q: '电流', u: 'A', g: '9' }, { q: '电压', u: 'V', g: '9' }, { q: '电阻', u: 'Ω', g: '9' },
+  ];
+
+  /* ---------- 常数 & 换算（公式抢答里混着出） ---------- */
+  const FACTS = [
+    C('真空中的光速约为', ['3×10⁸ m/s', '3×10⁵ m/s', '340 m/s', '1500 m/s'], 'c = 3×10⁸ m/s。'),
+    C('15 ℃ 时空气中的声速约为', ['340 m/s', '3×10⁸ m/s', '1500 m/s', '34 m/s'], '15 ℃ 空气中声速约 340 m/s。'),
+    C('1 m/s =', ['3.6 km/h', '36 km/h', '1/3.6 km/h', '60 km/h'], '1 m/s = 3.6 km/h。'),
+    C('1 g/cm³ =', ['1×10³ kg/m³', '1 kg/m³', '1×10⁻³ kg/m³', '1×10⁶ kg/m³'], '1 g/cm³ = 1×10³ kg/m³。'),
+    C('水的密度是', ['1.0×10³ kg/m³', '1.0 kg/m³', '0.8×10³ kg/m³', '13.6×10³ kg/m³'], 'ρ水 = 1.0×10³ kg/m³。'),
+    C('g = 9.8 N/kg 的意义是', ['质量为 1 kg 的物体受到的重力是 9.8 N', '1 kg = 9.8 N', '重力为 1 N 的物体质量是 9.8 kg', '物体下落速度是 9.8 m/s'], 'g 表示质量 1 kg 的物体受到的重力为 9.8 N（kg 和 N 是不同物理量的单位，不能画等号）。'),
+    C('1 标准大气压约为', ['1.013×10⁵ Pa', '1.013×10³ Pa', '760 Pa', '1×10⁸ Pa'], '约 1.013×10⁵ Pa，相当于 760 mm 水银柱。'),
+    C('水的比热容是', ['4.2×10³ J/(kg·℃)', '4.2×10⁶ J/(kg·℃)', '2.1×10³ J/(kg·℃)', '4.2 J/(kg·℃)'], 'c水 = 4.2×10³ J/(kg·℃)。'),
+    C('1 kW·h =', ['3.6×10⁶ J', '3.6×10³ J', '1000 J', '3600 J'], '1 kW·h = 3.6×10⁶ J。'),
+    C('一节新干电池的电压是', ['1.5 V', '2 V', '3 V', '36 V'], '1.5 V。'),
+    C('我国家庭电路电压是', ['220 V', '110 V', '36 V', '1.5 V'], '220 V。'),
+    C('对人体的安全电压是', ['不高于 36 V', '不高于 220 V', '等于 36 V', '高于 36 V'], '不高于 36 V。'),
+    C('1 A =', ['1000 mA', '100 mA', '10 mA', '10⁶ mA'], '1 A = 10³ mA = 10⁶ μA。'),
+    C('1 L =', ['1×10⁻³ m³', '1 m³', '1×10³ m³', '1×10⁻⁶ m³'], '1 L = 1 dm³ = 10⁻³ m³。'),
+    C('人耳的听觉频率范围是', ['20 Hz～20000 Hz', '0～20 Hz', '20000 Hz 以上', '2 Hz～2000 Hz'], '20 Hz～20000 Hz。'),
+  ];
+  FACTS.forEach((q, i) => { q.id = 'fact-' + i; q.ch = 'fact'; });
+
+  window.PHY = { CHAPTERS, GRADES, FORMULAS, UNITS, FACTS };
+})();
+</script>
+<script>
+/* WebAudio 合成音效，无需音频文件 */
+window.SFX = (function () {
+  let ctx = null;
+  let muted = localStorage.getItem('wl_muted') === '1';
+  function ac() {
+    if (!ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (!AC) return null;
+      ctx = new AC();
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  function tone(freq, dur, type = 'sine', vol = 0.2, slideTo = null, delay = 0) {
+    if (muted) return;
+    const c = ac(); if (!c) return;
+    const t = c.currentTime + delay;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(freq, t);
+    if (slideTo) o.frequency.exponentialRampToValueAtTime(slideTo, t + dur);
+    g.gain.setValueAtTime(vol, t);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(c.destination);
+    o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise(dur, vol = 0.3, filterFreq = 1200, delay = 0, endFreq = 100) {
+    if (muted) return;
+    const c = ac(); if (!c) return;
+    const t = c.currentTime + delay;
+    const len = Math.floor(c.sampleRate * dur);
+    const buf = c.createBuffer(1, len, c.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 2);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'lowpass';
+    f.frequency.setValueAtTime(filterFreq, t);
+    f.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    const g = c.createGain(); g.gain.setValueAtTime(vol, t);
+    src.connect(f).connect(g).connect(c.destination);
+    src.start(t);
+  }
+  return {
+    unlock() { ac(); },
+    get muted() { return muted; },
+    toggle() { muted = !muted; localStorage.setItem('wl_muted', muted ? '1' : '0'); return muted; },
+    shoot() { noise(0.12, 0.35, 6000, 0, 800); tone(900, 0.12, 'square', 0.08, 120); },
+    boom(combo = 0) {
+      noise(0.5, 0.5, 2500, 0.08, 60);
+      tone(110, 0.4, 'sine', 0.35, 40, 0.08);
+      const base = 520 * Math.pow(1.06, Math.min(combo, 12));
+      tone(base, 0.12, 'triangle', 0.12, null, 0.12);
+      tone(base * 1.5, 0.15, 'triangle', 0.1, null, 0.2);
+    },
+    wrong() { tone(200, 0.25, 'sawtooth', 0.12, 110); tone(150, 0.3, 'square', 0.06, 90, 0.08); },
+    flip() { tone(700, 0.06, 'sine', 0.08, 1100); },
+    tap() { tone(600, 0.04, 'sine', 0.06); },
+    ding(combo = 0) { const b = 660 * Math.pow(1.06, Math.min(combo, 12)); tone(b, 0.15, 'triangle', 0.15); tone(b * 1.26, 0.2, 'triangle', 0.12, null, 0.08); },
+    tick() { tone(1000, 0.05, 'square', 0.05); },
+    go() { tone(880, 0.25, 'triangle', 0.18); },
+    end() { [523, 659, 784, 1046].forEach((f, i) => tone(f, 0.25, 'triangle', 0.15, null, i * 0.12)); },
+    bubble() { for (let i = 0; i < 6; i++) tone(300 + Math.random() * 500, 0.06, 'sine', 0.07, 900 + Math.random() * 600, i * 0.09); },
+    whoosh() { noise(0.35, 0.25, 3000, 0, 300); tone(300, 0.3, 'triangle', 0.08, 700); },
+    fizz() { noise(0.4, 0.18, 8000, 0, 2000); },
+    pop() { noise(0.08, 0.4, 4000, 0, 400); tone(500, 0.1, 'sine', 0.12, 150); },
+    clear() { [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.15, 'triangle', 0.12, null, i * 0.07)); },
+  };
+})();
+</script>
+<script>
+/* 快乐掌握物理 —— 主逻辑：闯关 / 大乱斗 / 公式抢答 / 单位连连看 / 错题本 / 公式卡 */
+(function () {
+  'use strict';
+  const { CHAPTERS, GRADES, FORMULAS, UNITS, FACTS } = window.PHY;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+  const rand = a => a[Math.floor(Math.random() * a.length)];
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const CH = Object.fromEntries(CHAPTERS.map(c => [c.id, c]));
+  const FACT_G = ['8a', '8a', '8a', '8a', '8a', '8b', '8b', '9', '9', '9', '9', '9', '9', '8a', '8a'];
+  FACTS.forEach((f, i) => (f.g = FACT_G[i] || 'all'));
+
+  /* ---------- 存储 ---------- */
+  const store = {
+    get(k, d) { try { const v = JSON.parse(localStorage.getItem(k)); return v == null ? d : v; } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} },
+  };
+  const settings = Object.assign({ time: 60, scope: 'all' }, store.get('wl_settings', {}));
+  const best = store.get('wl_best', {});            // rush / match / blitz / lv:<id>
+  const stars = store.get('wl_stars', {});          // chapterId -> 0..3
+  let wrongBook = store.get('wl_wrong', {});        // qid -> {n, t, q}
+  const stat = Object.assign({ done: 0, right: 0, streak: 0, last: '' }, store.get('wl_stat', {}));
+  const saveWrong = () => store.set('wl_wrong', wrongBook);
+  const snap = q => ({ t: q.t, tag: q.tag, q: q.q, opts: q.opts, ans: q.ans, unit: q.unit, ex: q.ex, id: q.id, ch: q.ch });
+  function addWrong(q) { const w = wrongBook[q.id] || { n: 0 }; w.n++; w.t = Date.now(); w.q = snap(q); wrongBook[q.id] = w; saveWrong(); }
+  function delWrong(id) { if (wrongBook[id]) { delete wrongBook[id]; saveWrong(); } }
+  const dayStr = d => { const x = new Date(d); return x.getFullYear() + '-' + (x.getMonth() + 1) + '-' + x.getDate(); };
+  function record(ok) {
+    stat.done++; if (ok) stat.right++;
+    const today = dayStr(Date.now()), yest = dayStr(Date.now() - 864e5);
+    if (stat.last !== today) { stat.streak = stat.last === yest ? stat.streak + 1 : 1; stat.last = today; }
+    store.set('wl_stat', stat);
+  }
+  const inScope = g => settings.scope === 'all' || g === settings.scope;
+
+  let toastTimer;
+  function toast(msg, ms = 2200) {
+    const t = $('#toast'); t.innerHTML = msg; t.classList.add('show');
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+  }
+
+  /* ---------- 屏幕切换 ---------- */
+  let current = null, view = 'home', viewArg = null;
+  function show(id) {
+    $$('.screen').forEach(s => s.classList.toggle('active', s.id === id));
+    $('#btnHome').hidden = id === 'scrHome';
+    const el = document.getElementById(id);
+    $('#hud').hidden = !(el && el.dataset.hud);
+    window.scrollTo(0, 0);
+  }
+  function stopAll() { if (current) { current.stop(); current = null; } $('#countdown').hidden = true; }
+  function setBrand(t) { $('#brand').textContent = t; }
+
+  /* ---------- HUD & 计时 ---------- */
+  const hud = {
+    score: 0, combo: 0, maxCombo: 0,
+    reset() { this.score = 0; this.combo = 0; this.maxCombo = 0; this.draw(); },
+    add(base) { this.score += base + Math.min(this.combo, 10) * 2; this.combo++; this.maxCombo = Math.max(this.maxCombo, this.combo); this.draw(true); },
+    miss() { this.combo = 0; this.draw(); },
+    draw(hot) {
+      $('#hudScore').textContent = this.score;
+      const c = $('#hudCombo'); c.textContent = this.combo ? '×' + this.combo : '0';
+      c.classList.remove('hot'); if (hot && this.combo >= 3) { void c.offsetWidth; c.classList.add('hot'); }
+    },
+  };
+  function Timer(seconds, onEnd) {
+    let end = 0, total = seconds * 1000, iv = null, lastSec = null;
+    const draw = () => {
+      const left = Math.max(0, end - performance.now());
+      const sec = Math.ceil(left / 1000);
+      $('#hudTime').textContent = sec;
+      $('#timebarFill').style.width = (left / total * 100) + '%';
+      $('#timebarFill').style.backgroundPosition = (100 - left / total * 100) + '% 0';
+      $('.hud .timer').classList.toggle('low', sec <= 10);
+      if (sec !== lastSec && sec <= 5 && sec > 0) SFX.tick();
+      lastSec = sec;
+      if (left <= 0) { this.stop(); onEnd(); }
+    };
+    this.start = () => { end = performance.now() + seconds * 1000; draw(); iv = setInterval(draw, 100); };
+    this.stop = () => { clearInterval(iv); iv = null; };
+    this.bonus = s => { end += s * 1000; total = Math.max(total, end - performance.now()); draw(); };
+    this.preview = () => { $('#hudTimeK').textContent = '时间'; $('#hudTime').textContent = seconds; $('#timebarFill').style.width = '100%'; $('.hud .timer').classList.remove('low'); };
+  }
+  function progress(i, n) {
+    $('#hudTimeK').textContent = '进度';
+    $('#hudTime').textContent = Math.min(i + 1, n) + '/' + n;
+    $('#timebarFill').style.width = ((n - i) / n * 100) + '%';
+    $('#timebarFill').style.backgroundPosition = '0 0';
+    $('.hud .timer').classList.remove('low');
+  }
+  function countdown(cb) {
+    const el = $('#countdown'); el.hidden = false;
+    const seq = ['3', '2', '1', 'GO!']; let i = 0;
+    const step = () => {
+      if (!current) { el.hidden = true; return; }
+      if (i >= seq.length) { el.hidden = true; cb(); return; }
+      el.innerHTML = `<span>${seq[i]}</span>`;
+      i === 3 ? SFX.go() : SFX.tick();
+      i++; setTimeout(step, i === 4 ? 350 : 450);
+    };
+    step();
+  }
+
+  /* ---------- 结算 ---------- */
+  function finish({ title, key, stats: st, misses, starN, again, next }) {
+    SFX.end();
+    const old = best[key] || 0, rec = hud.score > old;
+    if (rec) { best[key] = hud.score; store.set('wl_best', best); }
+    $('#mTitle').textContent = title;
+    const ms = $('#mStars');
+    ms.hidden = starN == null;
+    if (starN != null) ms.innerHTML = [0, 1, 2].map(i => `<span class="${i < starN ? 'on' : ''}" style="animation-delay:${i * .18}s">★</span>`).join('');
+    $('#mRecord').hidden = !rec || hud.score === 0;
+    $('#mStats').innerHTML = [['得分', hud.score], ['最佳', Math.max(old, hud.score)], ['最高连击', hud.maxCombo], ...st]
+      .map(([k, v]) => `<div class="m-stat"><b>${v}</b><span>${k}</span></div>`).join('');
+    $('#mMiss').innerHTML = misses && misses.length
+      ? '<h4>❌ 本局答错（已收进错题本）</h4>' + misses.map(q => `<div class="mrow lab-mrow"><span>${q.q}</span><b>${answerText(q)}</b></div>`).join('')
+      : '<p style="text-align:center">🎉 一个都没错，太强了！</p>';
+    $('#btnNextLv').hidden = !next;
+    $('#btnNextLv').onclick = () => { $('#modal').hidden = true; next && next(); };
+    $('#btnAgain').onclick = () => { $('#modal').hidden = true; again(); };
+    $('#modal').hidden = false;
+  }
+  const answerText = q => q.t === 'c' ? q.opts[0] : q.t === 'tf' ? (q.ans ? '✔ 正确' : '✘ 错误') : q.ans + ' ' + q.unit;
+
+  /* =========================================================
+   * 答题引擎：level 闯关 / blitz 大乱斗 / rush 公式抢答 / practice 错题练习
+   * ========================================================= */
+  function genRush() {
+    const fs = FORMULAS.filter(f => inScope(f.g));
+    const us = UNITS.filter(u => inScope(u.g));
+    const facts = FACTS.filter(f => inScope(f.g));
+    const r = Math.random();
+    const others = (f, key) => shuffle(FORMULAS.filter(o => o.id !== f.id && !(f.excl || []).includes(o.id) && o[key] !== f[key])).map(o => o[key]);
+    if (r < 0.32 && fs.length) {
+      const f = rand(fs);
+      return { t: 'c', id: 'rf-' + f.id, ch: 'rush', tag: '🧮 公式', q: `「${f.name}」的公式是？`, opts: [f.f, ...others(f, 'f').slice(0, 3)], ex: `${f.name}：<b>${f.f}</b>${f.unit ? '，结果单位 ' + f.unit : ''}` };
+    }
+    if (r < 0.55 && fs.length) {
+      const f = rand(fs);
+      return { t: 'c', id: 'rn-' + f.id, ch: 'rush', tag: '🧮 公式', q: `公式 <span class="fx">${f.f}</span> 是？`, opts: [f.name, ...others(f, 'name').slice(0, 3)], ex: `<b>${f.f}</b> 是${f.name}的公式。` };
+    }
+    if (r < 0.8 && us.length) {
+      const u = rand(us);
+      const wrong = shuffle(UNITS.filter(o => o.u !== u.u)).slice(0, 3).map(o => o.u);
+      return { t: 'c', id: 'ru-' + u.q, ch: 'rush', tag: '📏 单位', q: `「${u.q}」的国际单位（或常用单位）是？`, opts: [u.u, ...wrong], ex: `${u.q}的单位是 <b>${u.u}</b>。` };
+    }
+    const f = rand(facts.length ? facts : FACTS);
+    return Object.assign({ tag: '🔢 常数与换算' }, f);
+  }
+
+  function QuizGame(opts) {
+    this.opts = opts;
+    const mode = opts.mode;
+    const timed = mode === 'blitz' || mode === 'rush';
+    let list = [], i = 0, cur = null, running = false, busy = true, right = 0, wrong = 0, numStr = '';
+    const misses = [];
+    let timer = null;
+    if (mode === 'level') { const ch = CH[opts.ch]; list = shuffle(ch.qs).slice(0, 8); }
+    else if (mode === 'practice') { list = shuffle(Object.values(wrongBook).map(w => w.q)); }
+    else if (mode === 'blitz') { list = shuffle(CHAPTERS.filter(c => inScope(c.grade)).flatMap(c => c.qs)); }
+    if (timed) timer = new Timer(settings.time, () => end());
+    const n = list.length;
+
+    function render() {
+      if (mode === 'rush') { let q; do { q = genRush(); } while (cur && q.id === cur.id); cur = q; }
+      else { if (i >= list.length) { if (mode === 'blitz') { list = shuffle(list); i = 0; } else return end(); } cur = list[i]; }
+      if (!timed) progress(i, n);
+      const ch = CH[cur.ch];
+      $('#qTag').innerHTML = (cur.tag || (ch ? `${ch.emoji} 第${ch.no}章 ${ch.name}` : '🔢 常数与换算')) + `<span class="qt-type">${{ c: '单选', tf: '判断', n: '计算' }[cur.t]}</span>`;
+      $('#qText').innerHTML = cur.q;
+      $('#qCard').classList.remove('in'); void $('#qCard').offsetWidth; $('#qCard').classList.add('in');
+      $('#qNote').innerHTML = ''; $('#qNext').hidden = true;
+      const box = $('#qOpts'); box.innerHTML = '';
+      $('#numWrap').hidden = cur.t !== 'n';
+      if (cur.t === 'n') {
+        numStr = ''; drawNum(); $('#numUnit').textContent = cur.unit;
+        $$('#numpad .key').forEach(k => (k.disabled = false));
+      } else {
+        const items = cur.t === 'tf'
+          ? [{ html: '✔ 正确', ok: cur.ans === true, v: true }, { html: '✘ 错误', ok: cur.ans === false, v: false }]
+          : shuffle(cur.opts.map((o, k) => ({ html: o, ok: k === 0 })));
+        box.classList.toggle('tf', cur.t === 'tf');
+        items.forEach(o => {
+          const b = document.createElement('button'); b.className = 'opt'; b.innerHTML = o.html; b._o = o;
+          b.addEventListener('click', () => pick(b));
+          box.appendChild(b);
+        });
+      }
+      busy = false;
+    }
+    function drawNum() { const v = $('#numVal'); v.textContent = numStr || '?'; v.classList.toggle('empty', !numStr); v.classList.remove('ok', 'bad'); }
+    function pick(b) {
+      if (!running || busy) return;
+      SFX.unlock(); busy = true;
+      $$('#qOpts .opt').forEach(o => { o.disabled = true; if (o._o.ok) o.classList.add('right'); });
+      if (!b._o.ok) b.classList.add('wrongpick');
+      judge(b._o.ok);
+    }
+    function submitNum() {
+      if (!running || busy || !numStr || numStr === '.') return;
+      SFX.unlock(); busy = true;
+      const v = parseFloat(numStr), ok = Math.abs(v - cur.ans) <= 1e-6 * Math.max(1, Math.abs(cur.ans));
+      $('#numVal').classList.add(ok ? 'ok' : 'bad');
+      $$('#numpad .key').forEach(k => (k.disabled = true));
+      judge(ok);
+    }
+    function key(k) {
+      if (!running || busy || cur.t !== 'n') return;
+      SFX.tap();
+      if (k === 'del') numStr = numStr.slice(0, -1);
+      else if (k === 'clr') numStr = '';
+      else if (k === 'ok') return submitNum();
+      else if (k === '.') { if (!numStr.includes('.')) numStr = (numStr || '0') + '.'; }
+      else if (numStr.length < 9) numStr = numStr === '0' ? k : numStr + k;
+      drawNum();
+    }
+    this.onKey = e => {
+      if (!cur) return;
+      if (!busy && cur.t === 'n') {
+        if (/^[0-9]$/.test(e.key)) key(e.key); else if (e.key === '.') key('.'); else if (e.key === 'Backspace') key('del'); else if (e.key === 'Enter') key('ok');
+      } else if (!busy && /^[1-4]$/.test(e.key)) { const b = $$('#qOpts .opt')[+e.key - 1]; if (b) pick(b); }
+      else if (busy && (e.key === 'Enter' || e.key === ' ') && !$('#qNext').hidden) $('#qNext').click();
+    };
+    function judge(ok) {
+      record(ok);
+      const corr = cur.t === 'c' ? '' : cur.t === 'tf' ? '' : `正确答案：<b>${cur.ans} ${cur.unit}</b>　`;
+      if (ok) {
+        right++; hud.add(timed ? 10 : 10); SFX.ding(hud.combo);
+        if (mode === 'practice') delWrong(cur.id);
+        $('#qNote').innerHTML = `<b class="okc">✔ 正确！</b>${mode === 'practice' ? '（已移出错题本）' : ''} ${cur.ex}`;
+      } else {
+        wrong++; hud.miss(); SFX.wrong(); addWrong(cur); misses.push(cur);
+        $('#qCard').classList.add('shake'); setTimeout(() => $('#qCard').classList.remove('shake'), 400);
+        $('#qNote').innerHTML = `<b class="badc">✘ 答错了</b>　${corr}${cur.ex}`;
+      }
+      i++;
+      if (timed && ok) setTimeout(() => { if (running) render(); }, 750);
+      else { $('#qNext').hidden = false; }
+    }
+    $('#qNext').onclick = () => { if (!running) return; SFX.tap(); if (!timed && i >= n) end(); else render(); };
+    const self = this;
+    function end() {
+      if (!running) return;
+      running = false; if (timer) timer.stop();
+      const total = right + wrong, acc = total ? Math.round(right / total * 100) : 0;
+      const st = [['答对', right], ['答错', wrong], ['正确率', total ? acc + '%' : '-']];
+      if (mode === 'level') {
+        const ch = CH[opts.ch];
+        const sN = acc >= 90 ? 3 : acc >= 70 ? 2 : acc >= 50 ? 1 : 0;
+        const had = stars[ch.id] || 0;
+        if (sN > had) { stars[ch.id] = sN; store.set('wl_stars', stars); }
+        const nx = CHAPTERS[ch.no];
+        finish({ title: sN ? `🎉 第${ch.no}章 闯关成功！` : '💪 差一点，再来一次！', key: 'lv:' + ch.id, stats: st, misses, starN: sN,
+          again: () => startQuiz({ mode: 'level', ch: ch.id }), next: nx ? () => openChapter(nx.id) : null });
+      } else if (mode === 'practice') {
+        finish({ title: '📒 错题练习完成', key: 'practice', stats: st, misses, again: () => Object.keys(wrongBook).length ? startQuiz({ mode: 'practice' }) : openWrong() });
+      } else {
+        finish({ title: '⏰ 时间到！', key: mode, stats: st, misses, again: () => startQuiz({ mode }) });
+      }
+    }
+    this.start = () => {
+      hud.reset();
+      $('#qText').innerHTML = ''; $('#qTag').innerHTML = ''; $('#qOpts').innerHTML = ''; $('#qNote').innerHTML = ''; $('#qNext').hidden = true; $('#numWrap').hidden = true;
+      if (timed) { timer.preview(); countdown(() => { running = true; timer.start(); render(); }); }
+      else { running = true; render(); }
+    };
+    this.stop = () => { running = false; if (timer) timer.stop(); };
+    this.key = key;
+    this.debug = () => ({ running, busy, mode, i, n, cur });
+  }
+  // 数字键盘
+  (function buildPad() {
+    const keys = [['7'], ['8'], ['9'], ['del', '⌫'], ['4'], ['5'], ['6'], ['clr', 'C'], ['1'], ['2'], ['3'], ['.', '.'], ['0', '0', 'w2'], ['ok', '✔ 提交', 'w2 go']];
+    $('#numpad').innerHTML = keys.map(([k, l, c]) => `<button class="key ${c || ''}" data-k="${k}">${l || k}</button>`).join('');
+    $('#numpad').addEventListener('click', e => { const b = e.target.closest('[data-k]'); if (b && current && current.key) current.key(b.dataset.k); });
+  })();
+
+  /* =========================================================
+   * 单位连连看
+   * ========================================================= */
+  function MatchGame() {
+    let running = false, sel = null, right = 0, wrong = 0, boards = 0;
+    const timer = new Timer(settings.time, () => end());
+    let pool = UNITS.filter(u => inScope(u.g)); if (pool.length < 6) pool = UNITS;
+    function deal() {
+      const pairs = shuffle(pool).slice(0, 6);
+      const tiles = shuffle(pairs.flatMap((p, k) => [{ id: p.q, kind: 'q', txt: p.q }, { id: p.q, kind: 'u', txt: p.u }]));
+      const g = $('#matchGrid'); g.innerHTML = '';
+      tiles.forEach(t => {
+        const b = document.createElement('button');
+        b.className = 'mtile ' + (t.kind === 'q' ? 'nm' : 'sym') + (t.txt.length > 5 ? ' long' : '');
+        b.dataset.id = t.id; b.dataset.kind = t.kind; b.textContent = t.txt;
+        b.addEventListener('click', () => tap(b));
+        g.appendChild(b);
+      });
+      sel = null;
+    }
+    function tap(b) {
+      if (!running || b.classList.contains('gone')) return;
+      SFX.unlock();
+      if (!sel) { sel = b; b.classList.add('sel'); SFX.tap(); return; }
+      if (sel === b) { b.classList.remove('sel'); sel = null; return; }
+      if (sel.dataset.kind === b.dataset.kind) { sel.classList.remove('sel'); sel = b; b.classList.add('sel'); SFX.tap(); return; }
+      const a = sel; sel = null; a.classList.remove('sel');
+      if (a.dataset.id === b.dataset.id) {
+        right++; record(true); hud.add(10); SFX.ding(hud.combo);
+        a.classList.add('gone'); b.classList.add('gone');
+        if (!$$('.mtile:not(.gone)').length) { boards++; timer.bonus(5); SFX.clear(); toast('🎉 清空一版！+5 秒'); setTimeout(() => running && deal(), 400); }
+      } else {
+        wrong++; record(false); hud.miss(); SFX.wrong();
+        [a, b].forEach(x => { x.classList.add('no'); setTimeout(() => x.classList.remove('no'), 450); });
+      }
+    }
+    function end() {
+      if (!running) return; running = false; timer.stop();
+      finish({ title: '⏰ 时间到！', key: 'match', stats: [['配对', right], ['配错', wrong], ['清空', boards + ' 版']], misses: [], again: () => startGame('match') });
+      $('#mMiss').innerHTML = '';
+    }
+    this.start = () => { hud.reset(); timer.preview(); $('#matchGrid').innerHTML = ''; countdown(() => { running = true; timer.start(); deal(); }); };
+    this.stop = () => { running = false; timer.stop(); };
+    this.debug = () => ({ running });
+  }
+
+  /* =========================================================
+   * 章节地图 & 章节详情
+   * ========================================================= */
+  const starStr = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+  function renderMap() {
+    $('#mapList').innerHTML = GRADES.map(g => `
+      <h3 class="sec-h">${g.name}</h3>
+      <div class="map-grid">${CHAPTERS.filter(c => c.grade === g.id).map(c => {
+        const s = stars[c.id] || 0;
+        return `<button class="map-tile${s === 3 ? ' full' : s ? ' some' : ''}" data-ch="${c.id}"><span class="mt-no">${c.no}</span><span class="mt-emoji">${c.emoji}</span><span class="mt-name">${c.name}</span><span class="mt-stars">${starStr(s)}</span></button>`;
+      }).join('')}</div>`).join('');
+  }
+  function openChapter(id) {
+    stopAll(); $('#modal').hidden = true;
+    const c = CH[id]; view = 'chapter'; viewArg = id;
+    setBrand(`${c.emoji} ${c.name}`);
+    $('#chEmoji').textContent = c.emoji;
+    $('#chNo').textContent = `第 ${c.no} 章 · ${GRADES.find(g => g.id === c.grade).name} · ${c.qs.length} 道题`;
+    $('#chName').textContent = c.name;
+    const s = stars[c.id] || 0;
+    $('#chStars').innerHTML = `<span class="st">${starStr(s)}</span> ${best['lv:' + c.id] ? '最佳 ' + best['lv:' + c.id] + ' 分' : '还没闯过'}`;
+    $('#chPoints').innerHTML = c.points.map((p, k) => `<div class="kp"><span class="kp-n">${k + 1}</span><div>${p}</div></div>`).join('');
+    $('#chFormH').hidden = !c.formulas.length;
+    $('#chForms').innerHTML = c.formulas.map(fcard).join('');
+    $('#btnChSim').hidden = !c.sim;
+    $('#btnChSim').onclick = () => window.WL.openSim(c.sim, 'chapter:' + c.id);
+    show('scrChapter');
+  }
+  const fcard = f => `<div class="fcard"><div class="fc-n">${f.n}</div><div class="fc-f">${f.f}</div>${f.u ? `<div class="fc-u">${f.u}</div>` : ''}</div>`;
+  $('#mapList').addEventListener('click', e => { const t = e.target.closest('[data-ch]'); if (t) { SFX.tap(); openChapter(t.dataset.ch); } });
+  $('#btnChStart').addEventListener('click', () => startQuiz({ mode: 'level', ch: viewArg }));
+
+  /* ---------- 错题本 / 公式卡 ---------- */
+  function renderWrong() {
+    const ids = Object.keys(wrongBook).sort((a, b) => wrongBook[b].t - wrongBook[a].t);
+    $('#wbSub').textContent = ids.length ? `共 ${ids.length} 题` : '';
+    $('#btnWbPractice').hidden = !ids.length;
+    $('#wbList').innerHTML = ids.length ? ids.map(id => {
+      const w = wrongBook[id], q = w.q, ch = CH[q.ch];
+      return `<div class="wb-lab"><span class="wb-kind">${ch ? ch.name : q.ch === 'rush' ? '公式抢答' : '常数换算'}</span><div class="wb-q">${q.q}</div><div class="wb-a">✔ ${answerText(q)}</div><div class="wb-ex">${q.ex}</div><span class="wb-cnt">错 ${w.n} 次</span></div>`;
+    }).join('') : '<div class="wb-empty">错题本空空如也～<br>去闯关或玩限时小游戏吧！</div>';
+  }
+  function openWrong() { stopAll(); $('#modal').hidden = true; view = 'wrong'; renderWrong(); setBrand('📒 错题本'); show('scrWrong'); }
+  function renderCards() {
+    $('#cardsList').innerHTML = GRADES.map(g => `<h3 class="sec-h">${g.name}</h3>` + CHAPTERS.filter(c => c.grade === g.id && c.formulas.length).map(c =>
+      `<div class="cards-ch"><div class="cc-h">${c.emoji} ${c.name}</div><div class="fc-list">${c.formulas.map(fcard).join('')}</div></div>`).join('')).join('')
+      + `<h3 class="sec-h">🔢 常用常数 & 换算</h3><div class="fc-list">${FACTS.map(f => `<div class="fcard sm"><div class="fc-n">${f.q.replace(/[=是为约]+$/, '')}</div><div class="fc-f">${f.opts[0]}</div></div>`).join('')}</div>`
+      + `<h3 class="sec-h">📏 物理量与单位</h3><div class="unit-grid">${UNITS.map(u => `<div class="uchip"><span>${u.q}</span><b>${u.u}</b></div>`).join('')}</div><div style="height:24px"></div>`;
+  }
+
+  /* ---------- 首页 ---------- */
+  function refreshMenu() {
+    $$('#segTime button').forEach(b => b.classList.toggle('on', +b.dataset.v === settings.time));
+    $$('#segScope button').forEach(b => b.classList.toggle('on', b.dataset.v === settings.scope));
+    ['rush', 'match', 'blitz'].forEach(k => ($(`[data-best="${k}"]`).textContent = best[k] ? '最佳 ' + best[k] : ''));
+    const total = Object.values(stars).reduce((a, b) => a + b, 0);
+    $('#mapBest').textContent = total ? `⭐ ${total}/${CHAPTERS.length * 3}` : '';
+    $('#stStars').textContent = total;
+    const today = dayStr(Date.now()), yest = dayStr(Date.now() - 864e5);
+    $('#stStreak').textContent = (stat.last === today || stat.last === yest) ? stat.streak : 0;
+    $('#stDone').textContent = stat.done;
+    $('#stAcc').textContent = stat.done ? Math.round(stat.right / stat.done * 100) + '%' : '-';
+    const n = Object.keys(wrongBook).length;
+    $('#wbCount').textContent = n ? n + ' 题' : '';
+    if (window.WL && window.WL.labSummary) $('#labBest').textContent = window.WL.labSummary();
+  }
+  function goHome() { stopAll(); view = 'home'; $('#modal').hidden = true; refreshMenu(); setBrand('⚛️ 快乐掌握物理'); show('scrHome'); }
+
+  /* ---------- 启动 ---------- */
+  function startQuiz(opts) {
+    stopAll(); $('#modal').hidden = true; SFX.unlock();
+    if (opts.mode === 'practice' && !Object.keys(wrongBook).length) { toast('错题本是空的 🎉'); return openWrong(); }
+    view = opts.mode === 'level' ? 'level' : opts.mode === 'practice' ? 'practice' : 'game';
+    if (opts.mode === 'level') viewArg = opts.ch;
+    const titles = { rush: '⚡ 公式抢答', blitz: '⏱️ 限时大乱斗', practice: '📒 错题练习' };
+    setBrand(opts.mode === 'level' ? `${CH[opts.ch].emoji} 第${CH[opts.ch].no}章 闯关` : titles[opts.mode]);
+    show('scrQuiz');
+    current = new QuizGame(opts); window.WL.game = current; current.start();
+  }
+  function startGame(name) {
+    stopAll(); $('#modal').hidden = true; SFX.unlock();
+    if (name === 'map') { view = 'map'; renderMap(); setBrand('🗺️ 章节闯关'); return show('scrMap'); }
+    if (name === 'wrongbook') return openWrong();
+    if (name === 'cards') { view = 'cards'; renderCards(); setBrand('📜 公式卡片'); return show('scrCards'); }
+    if (name === 'lab') return window.WL.openLab();
+    if (name === 'rush' || name === 'blitz') return startQuiz({ mode: name });
+    if (name === 'match') { view = 'game'; setBrand('🔗 单位连连看'); show('scrMatch'); current = new MatchGame(); window.WL.game = current; current.start(); }
+  }
+  function back() {
+    $('#modal').hidden = true;
+    if (view === 'chapter') return startGame('map');
+    if (view === 'level') return openChapter(viewArg);
+    if (view === 'practice') return openWrong();
+    if (view === 'sim') return window.WL.simBack();
+    goHome();
+  }
+
+  $('#menu').addEventListener('click', e => { const t = e.target.closest('[data-game]'); if (t) startGame(t.dataset.game); });
+  $('#segTime').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; settings.time = +b.dataset.v; store.set('wl_settings', settings); SFX.tap(); refreshMenu(); });
+  $('#segScope').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; settings.scope = b.dataset.v; store.set('wl_settings', settings); SFX.tap(); refreshMenu(); });
+  $('#btnHome').addEventListener('click', back);
+  $('#btnToHome').addEventListener('click', back);
+  $('#btnToWrong').addEventListener('click', openWrong);
+  $('#btnWbPractice').addEventListener('click', () => startQuiz({ mode: 'practice' }));
+  $('#btnWbClear').addEventListener('click', () => { if (confirm('确定清空错题本吗？')) { wrongBook = {}; saveWrong(); renderWrong(); } });
+  const muteBtn = $('#btnMute');
+  const drawMute = () => (muteBtn.textContent = SFX.muted ? '🔇' : '🔊');
+  muteBtn.addEventListener('click', () => { SFX.toggle(); drawMute(); SFX.tap(); });
+  document.addEventListener('keydown', e => { if (current && current.onKey && $('#modal').hidden) current.onKey(e); });
+
+  window.WL = {
+    data: window.PHY, startGame, startQuiz, openChapter, goHome,
+    core: { $, $$, rand, shuffle, store, toast, show, setBrand, stopAll, record, refreshMenu, setView(v) { view = v; } },
+  };
+  drawMute();
+  refreshMenu();
+})();
+</script>
+<script>
+/* 快乐掌握物理 · 🔬 物理实验室：可交互模拟 + 小任务 */
+(function () {
+  'use strict';
+  const W = window.WL, C = W.core, { $, $$, store, toast } = C;
+  const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const R2D = 180 / Math.PI, D2R = Math.PI / 180;
+  const f1 = x => (Math.round(x * 10) / 10).toString();
+  const f2 = x => (Math.round(x * 100) / 100).toFixed(2);
+  const arrowDefs = `<defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker>
+    <marker id="ahR" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#e8505b"/></marker>
+    <marker id="ahO" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#ff9f1a"/></marker>
+    <marker id="ahB" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2f7cf6"/></marker>
+    <marker id="ahG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#00a37a"/></marker>
+  </defs>`;
+  const ray = (x1, y1, x2, y2, col, mk, extra = '') => `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="2.6" stroke-linecap="round" ${mk ? `marker-end="url(#${mk})"` : ''} ${extra}/>`;
+  const txt = (x, y, s, cls = '', anchor = 'middle') => `<text x="${x}" y="${y}" class="st ${cls}" text-anchor="${anchor}">${s}</text>`;
+
+  /* =========================================================
+   * 1. 光的反射与折射
+   * ========================================================= */
+  const MED = { water: { n: 1.33, name: '水', fill: '#bfe3ff' }, glass: { n: 1.5, name: '玻璃', fill: '#cdeee3' } };
+  const light = {
+    id: 'light', emoji: '🌈', name: '光的反射与折射', ch: 'light', cls: 't1',
+    desc: '调入射角，看反射角、折射角怎么变',
+    init: () => ({ i: 30, med: 'water' }),
+    ctrls: [
+      { type: 'range', key: 'i', label: '入射角 i', min: 0, max: 80, step: 1, fmt: v => v + '°' },
+      { type: 'seg', key: 'med', label: '下方介质', opts: [['water', '💧 水'], ['glass', '🔷 玻璃']] },
+    ],
+    calc(s) { const n = MED[s.med].n; const r = Math.asin(Math.sin(s.i * D2R) / n) * R2D; return { r }; },
+    draw(s) {
+      const { r } = this.calc(s), O = [150, 112], L = 108, i = s.i * D2R, rr = r * D2R, R = 30;
+      const P = [O[0] - L * Math.sin(i), O[1] - L * Math.cos(i)];
+      const Rf = [O[0] + L * Math.sin(i), O[1] - L * Math.cos(i)];
+      const Rr = [O[0] + L * Math.sin(rr), O[1] + L * Math.cos(rr)];
+      const arc = (a, up, right, col) => {
+        if (a < 1) return '';
+        const sy = up ? -1 : 1, ex = O[0] + (right ? 1 : -1) * R * Math.sin(a * D2R), ey = O[1] + sy * R * Math.cos(a * D2R);
+        const sweep = up ? (right ? 1 : 0) : (right ? 0 : 1);
+        return `<path d="M${O[0]},${O[1] + sy * R} A${R},${R} 0 0 ${sweep} ${ex.toFixed(1)},${ey.toFixed(1)}" fill="none" stroke="${col}" stroke-width="2"/>`;
+      };
+      const lab = (a, up, right, s2, col) => { const m = (a / 2) * D2R, d = R + 13; return a < 1 ? '' : `<text x="${O[0] + (right ? 1 : -1) * d * Math.sin(m)}" y="${O[1] + (up ? -1 : 1) * d * Math.cos(m) + 4}" class="st b" fill="${col}" text-anchor="middle">${s2}</text>`; };
+      return `<svg viewBox="0 0 300 228" class="sim-svg">${arrowDefs}
+        <rect x="0" y="0" width="300" height="112" fill="#f3f9ff"/>
+        <rect x="0" y="112" width="300" height="116" fill="${MED[s.med].fill}"/>
+        ${txt(8, 18, '空气', 'm', 'start')}${txt(8, 220, MED[s.med].name, 'm', 'start')}
+        <line x1="0" y1="112" x2="300" y2="112" stroke="#5b6b8c" stroke-width="2"/>
+        <line x1="150" y1="6" x2="150" y2="222" stroke="#7a7f9a" stroke-width="1.5" stroke-dasharray="6 5"/>
+        ${txt(158, 16, '法线', 'm', 'start')}
+        ${ray(P[0], P[1], O[0], O[1], '#e8505b', 'ahR')}
+        ${ray(O[0], O[1], Rf[0], Rf[1], '#ff9f1a', 'ahO')}
+        ${ray(O[0], O[1], Rr[0], Rr[1], '#2f7cf6', 'ahB')}
+        ${arc(s.i, true, false, '#e8505b')}${arc(s.i, true, true, '#ff9f1a')}${arc(r, false, true, '#2f7cf6')}
+        ${lab(s.i, true, false, 'i', '#e8505b')}${lab(s.i, true, true, "i'", '#ff9f1a')}${lab(r, false, true, 'r', '#2f7cf6')}
+        <circle cx="150" cy="112" r="3.5" fill="#2d3047"/>
+        ${txt(P[0] + (s.i > 50 ? 6 : -4), P[1] + (s.i > 50 ? -6 : 14), '入射光线', 'r', s.i > 50 ? 'start' : 'end')}
+        ${txt(Rf[0] + (s.i > 50 ? -6 : 4), Rf[1] + (s.i > 50 ? -6 : 14), '反射光线', 'o', s.i > 50 ? 'end' : 'start')}
+        ${txt(Math.min(Rr[0] + 6, 292), Rr[1] - 4, '折射光线', 'bl', Rr[0] > 230 ? 'end' : 'start')}
+      </svg>`;
+    },
+    read(s) {
+      const { r } = this.calc(s);
+      return [['入射角 i', s.i + '°', 'r'], ['反射角 i′', s.i + '°', 'o'], ['折射角 r', f1(r) + '°', 'bl']];
+    },
+    tip(s) {
+      const { r } = this.calc(s);
+      if (s.i === 0) return '光<b>垂直</b>射入时，传播方向不改变（入射角、反射角、折射角都是 0°）。';
+      return `反射角 = 入射角 = ${s.i}°；光从空气斜射入${MED[s.med].name}，折射角 ${f1(r)}° <b>小于</b>入射角。入射角增大，折射角也增大。`;
+    },
+    tasks: [
+      { t: '让反射光线与入射光线<b>互相垂直</b>', hint: '两条光线的夹角 = 入射角 + 反射角 = 2i', check: s => s.i === 45 },
+      { t: '让光<b>垂直</b>射入水面，观察折射光线', hint: '垂直入射时，入射角是多少度？', check: s => s.i === 0 && s.med === 'water' },
+      { t: '换成<b>玻璃</b>，让折射角约为 <b>30°</b>（±1°）', hint: '折射角比入射角小，所以入射角要大于 30°', check: (s, me) => s.med === 'glass' && Math.abs(me.calc(s).r - 30) <= 1 },
+    ],
+  };
+
+  /* =========================================================
+   * 2. 凸透镜成像规律
+   * ========================================================= */
+  const lensImg = u => {
+    const f = 10;
+    if (u === f) return { none: true, kind: '不成像', use: '光线平行射出（可获得平行光）' };
+    const v = u * f / (u - f), m = Math.abs(v / u);
+    if (v < 0) return { v, m, real: false, kind: '正立、放大的虚像', use: '🔍 放大镜' };
+    const size = u > 2 * f ? '缩小' : u === 2 * f ? '等大' : '放大';
+    const use = u > 2 * f ? '📷 照相机' : u === 2 * f ? '📏 测焦距（u = v = 2f）' : '📽️ 投影仪';
+    return { v, m, real: true, size, kind: `倒立、${size}的实像`, use };
+  };
+  const lens = {
+    id: 'lens', emoji: '🔍', name: '凸透镜成像', ch: 'lens', cls: 't3',
+    desc: '移动蜡烛，看像的倒正、大小、虚实（f = 10 cm）',
+    init: () => ({ u: 15 }),
+    ctrls: [{ type: 'range', key: 'u', label: '物距 u', min: 4, max: 45, step: 1, fmt: v => v + ' cm' }],
+    draw(s) {
+      const k = 3.4, X = 170, Y = 104, h = 30, f = 10, u = s.u;
+      const x0 = X - u * k, ty = Y - h, im = lensImg(u);
+      let rays = '', img = '', note = '';
+      const ext = (x1, y1, x2, y2, toX) => { const t = (toX - x1) / (x2 - x1); return [toX, y1 + (y2 - y1) * t]; };
+      if (im.none) {
+        const e1 = ext(X, ty, X + f * k, Y, 340);
+        rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, 340, Y + (Y - ty) * (340 - X) / (X - x0) , '#00a37a');
+        note = txt(255, 30, '折射光平行，不成像', 'm');
+      } else {
+        const xi = X + im.v * k, hi = h * im.m, yi = im.real ? Y + hi : Y - hi;
+        if (im.real) {
+          const e1 = ext(X, ty, xi, yi, 340), e2 = ext(x0, ty, xi, yi, 340);
+          rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, e2[0], e2[1], '#00a37a');
+          if (xi < 336) img = `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${yi}" stroke="#e8505b" stroke-width="4" marker-end="url(#ahR)"/>` + txt(xi, Math.min(yi + 16, 196), '像', 'r');
+          else note = txt(334, 30, '像在很远处 →', 'r', 'end');
+        } else {
+          const e1 = ext(X, ty, X + f * k, Y, 340), e2 = ext(x0, ty, X, Y, 340);
+          rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, e2[0], e2[1], '#00a37a')
+            + `<line x1="${X}" y1="${ty}" x2="${xi}" y2="${yi}" stroke="#ff9f1a" stroke-width="1.6" stroke-dasharray="4 4"/>`
+            + `<line x1="${x0}" y1="${ty}" x2="${xi}" y2="${yi}" stroke="#00a37a" stroke-width="1.6" stroke-dasharray="4 4"/>`;
+          if (xi > 2) img = `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${yi}" stroke="#e8505b" stroke-width="3" stroke-dasharray="5 4" marker-end="url(#ahR)"/>` + txt(xi, Math.max(yi - 6, 12), '虚像', 'r');
+          else note = txt(8, 30, '← 虚像在很远处', 'r', 'start');
+        }
+      }
+      const mark = (x, l) => `<line x1="${x}" y1="${Y - 4}" x2="${x}" y2="${Y + 4}" stroke="#2d3047" stroke-width="2"/>` + txt(x, Y + 17, l, 'm');
+      return `<svg viewBox="0 0 340 200" class="sim-svg">${arrowDefs}
+        <rect width="340" height="200" fill="#fbfdff"/>
+        <line x1="0" y1="${Y}" x2="340" y2="${Y}" stroke="#9aa3bf" stroke-width="1.5"/>
+        ${mark(X - 2 * f * k, '2F')}${mark(X - f * k, 'F')}${mark(X + f * k, 'F')}${mark(X + 2 * f * k, '2F')}
+        <ellipse cx="${X}" cy="${Y}" rx="9" ry="70" fill="rgba(120,190,255,.35)" stroke="#2f7cf6" stroke-width="2"/>
+        ${txt(X, 196, '凸透镜', 'bl')}
+        ${rays}
+        <line x1="${x0}" y1="${Y}" x2="${x0}" y2="${ty}" stroke="#2d3047" stroke-width="4" marker-end="url(#ah)"/>
+        <text x="${x0}" y="${ty - 8}" text-anchor="middle" font-size="16">🕯️</text>
+        ${img}${note}
+      </svg>`;
+    },
+    read(s) {
+      const im = lensImg(s.u);
+      return [['物距 u', s.u + ' cm', ''], ['像距 v', im.none ? '—' : im.real ? f1(im.v) + ' cm' : '同侧 ' + f1(-im.v) + ' cm', 'r'], ['像', im.kind, 'bl']];
+    },
+    tip(s) {
+      const im = lensImg(s.u);
+      const zone = s.u > 20 ? 'u > 2f' : s.u === 20 ? 'u = 2f' : s.u > 10 ? 'f < u < 2f' : s.u === 10 ? 'u = f' : 'u < f';
+      return `<b>${zone}</b>：${im.kind}　应用：${im.use}。<br><small>口诀：一倍焦距分虚实，二倍焦距分大小；成实像时物近像远像变大。</small>`;
+    },
+    tasks: [
+      { t: '像<b>照相机</b>那样：调出倒立、<b>缩小</b>的实像', hint: '物体要放在二倍焦距（20 cm）以外', check: s => s.u > 20 },
+      { t: '像<b>投影仪</b>那样：调出倒立、<b>放大</b>的实像', hint: '物距在一倍和二倍焦距之间', check: s => s.u > 10 && s.u < 20 },
+      { t: '调出倒立、<b>等大</b>的实像', hint: '此时 u = v = 2f', check: s => s.u === 20 },
+      { t: '像<b>放大镜</b>那样：调出正立、放大的<b>虚像</b>', hint: '物体放在一倍焦距以内', check: s => s.u < 10 },
+    ],
+  };
+
+  /* =========================================================
+   * 3. 杠杆平衡
+   * ========================================================= */
+  const HOOK = 0.5;
+  const lever = {
+    id: 'lever', emoji: '⚖️', name: '杠杆平衡', ch: 'machine', cls: 't2',
+    desc: '挂钩码让杠杆水平平衡：F₁L₁ = F₂L₂',
+    init: () => ({ lc: 2, lp: 3, rc: 1, rp: 1 }),
+    ctrls: [
+      { type: 'step', key: 'rc', label: '右侧钩码个数', min: 1, max: 6, fmt: v => v + ' 个' },
+      { type: 'step', key: 'rp', label: '右侧挂在第几格', min: 1, max: 5, fmt: v => '第 ' + v + ' 格' },
+    ],
+    draw(s) {
+      const cx = 160, cy = 78, g = 27, tl = s.lc * s.lp, tr = s.rc * s.rp;
+      const deg = clamp((tr - tl) * 2.2, -14, 14), a = deg * D2R;
+      const pt = d => [cx + d * g * Math.cos(a), cy + d * g * Math.sin(a)];
+      const beamEnd1 = pt(-5.6), beamEnd2 = pt(5.6);
+      let ticks = '';
+      for (let d = -5; d <= 5; d++) { if (!d) continue; const [x, y] = pt(d); ticks += `<circle cx="${x}" cy="${y}" r="2.6" fill="#fff" stroke="#8a6d3b"/>` + `<text x="${x}" y="${y - 7}" class="st m" text-anchor="middle">${Math.abs(d)}</text>`; }
+      const stack = (d, n, col) => {
+        const [x, y] = pt(d); let s2 = `<line x1="${x}" y1="${y}" x2="${x}" y2="${y + 16}" stroke="#555" stroke-width="1.5"/>`;
+        for (let k = 0; k < n; k++) s2 += `<rect x="${x - 9}" y="${y + 16 + k * 15}" width="18" height="13" rx="3" fill="${col}" stroke="#555"/>`;
+        return s2;
+      };
+      const bal = tl === tr;
+      return `<svg viewBox="0 0 320 200" class="sim-svg">
+        <rect width="320" height="200" fill="#fffdf6"/>
+        <path d="M${cx - 18},190 L${cx},${cy + 4} L${cx + 18},190 Z" fill="#c9b68f" stroke="#8a6d3b" stroke-width="2"/>
+        <line x1="${beamEnd1[0]}" y1="${beamEnd1[1]}" x2="${beamEnd2[0]}" y2="${beamEnd2[1]}" stroke="#d9a75f" stroke-width="10" stroke-linecap="round"/>
+        ${ticks}
+        <circle cx="${cx}" cy="${cy}" r="5" fill="#2d3047"/>
+        ${stack(-s.lp, s.lc, '#7b8cff')}${stack(s.rp, s.rc, '#ff9f43')}
+        ${txt(cx, 22, bal ? '⚖️ 水平平衡！' : tl > tr ? '⬅ 左边下沉' : '右边下沉 ➡', bal ? 'ok b' : 'r b')}
+      </svg>`;
+    },
+    read(s) {
+      const L = (s.lc * HOOK) * s.lp, R = (s.rc * HOOK) * s.rp;
+      return [['左 F₁×L₁', `${f1(s.lc * HOOK)}N×${s.lp}格=${f1(L)}`, 'bl'], ['右 F₂×L₂', `${f1(s.rc * HOOK)}N×${s.rp}格=${f1(R)}`, 'o'], ['结果', L === R ? '✅ 相等' : L > R ? '左 > 右' : '左 < 右', L === R ? 'ok' : 'r']];
+    },
+    tip: () => '每个钩码重 0.5 N。杠杆平衡条件：<b>动力 × 动力臂 = 阻力 × 阻力臂</b>（F₁L₁ = F₂L₂）。',
+    tasks: [
+      { t: '左边 2 个钩码挂在第 3 格，在右边挂钩码，让杠杆<b>水平平衡</b>', hint: '2 × 3 = 右边个数 × 格数', setup: s => Object.assign(s, { lc: 2, lp: 3, rc: 1, rp: 1 }), check: s => s.lc * s.lp === s.rc * s.rp },
+      { t: '左边 4 个钩码挂在第 2 格，右边只用 <b>2 个</b>钩码让它平衡', hint: '4 × 2 = 2 × ?', setup: s => Object.assign(s, { lc: 4, lp: 2, rc: 1, rp: 1 }), check: s => s.rc === 2 && s.lc * s.lp === s.rc * s.rp },
+      { t: '左边 3 个钩码在第 4 格，右边挂在 <b>第 2 格</b>，需要几个钩码？', hint: '3 × 4 = ? × 2', setup: s => Object.assign(s, { lc: 3, lp: 4, rc: 1, rp: 1 }), check: s => s.rp === 2 && s.lc * s.lp === s.rc * s.rp },
+    ],
+  };
+
+  /* =========================================================
+   * 4. 浮力与浮沉
+   * ========================================================= */
+  const LIQ = { alc: { r: 8, name: '酒精', fill: '#f4f0d0' }, water: { r: 10, name: '水', fill: '#bfe3ff' }, salt: { r: 12, name: '盐水', fill: '#c8d8f0' } };
+  const buoyCalc = s => {
+    const ro = s.rho / 10, rl = LIQ[s.liq].r / 10, G = ro;           // V = 100 cm³，g = 10 N/kg → G = ρ(g/cm³) N
+    if (s.rho < LIQ[s.liq].r) return { ro, rl, G, F: G, Vp: 100 * ro / rl, state: '漂浮', N: 0 };
+    if (s.rho === LIQ[s.liq].r) return { ro, rl, G, F: G, Vp: 100, state: '悬浮', N: 0 };
+    return { ro, rl, G, F: rl, Vp: 100, state: '下沉（沉底）', N: G - rl };
+  };
+  const buoy = {
+    id: 'buoy', emoji: '🚢', name: '浮力与浮沉', ch: 'buoy', cls: 't6',
+    desc: '改变物块密度和液体，看漂浮、悬浮、下沉',
+    init: () => ({ rho: 5, liq: 'water' }),
+    ctrls: [
+      { type: 'range', key: 'rho', label: '物块密度 ρ物', min: 1, max: 30, step: 1, fmt: v => (v / 10).toFixed(1) + ' g/cm³' },
+      { type: 'seg', key: 'liq', label: '液体', opts: [['alc', '酒精 0.8'], ['water', '水 1.0'], ['salt', '盐水 1.2']] },
+    ],
+    draw(s) {
+      const c = buoyCalc(s), top = 78, bot = 200, side = 52;
+      let y;
+      if (c.state === '漂浮') y = top - side + side * c.ro / c.rl;
+      else if (c.state === '悬浮') y = 118;
+      else y = bot - side - 2;
+      const x = 150 - side / 2, mid = y + side / 2;
+      const shade = Math.round(clamp(230 - s.rho * 6, 60, 230));
+      const col = `rgb(${shade + 20},${Math.round(shade * .8)},${Math.round(shade * .55)})`;
+      const lenG = clamp(30 + c.G * 14, 30, 80), lenF = c.F ? clamp(30 + c.F * 14, 30, 80) : 0;
+      return `<svg viewBox="0 0 300 214" class="sim-svg">${arrowDefs}
+        <rect width="300" height="214" fill="#fbfdff"/>
+        <rect x="62" y="${top}" width="176" height="${bot - top}" fill="${LIQ[s.liq].fill}"/>
+        <path d="M60,30 L60,202 L240,202 L240,30" fill="none" stroke="#7a8bb0" stroke-width="3"/>
+        <line x1="62" y1="${top}" x2="238" y2="${top}" stroke="#5b8cc9" stroke-width="1.5" stroke-dasharray="5 4"/>
+        ${txt(232, top + 16, LIQ[s.liq].name, 'm', 'end')}
+        <rect x="${x}" y="${y}" width="${side}" height="${side}" rx="4" fill="${col}" stroke="#5a4630" stroke-width="2"/>
+        <line x1="${150 + 6}" y1="${mid}" x2="${150 + 6}" y2="${mid + lenG}" stroke="#e8505b" stroke-width="3" marker-end="url(#ahR)"/>
+        ${txt(150 + 12, mid + lenG - 2, 'G = ' + f2(c.G) + ' N', 'r b', 'start')}
+        ${c.F ? `<line x1="${150 - 6}" y1="${mid}" x2="${150 - 6}" y2="${mid - lenF}" stroke="#00a37a" stroke-width="3" marker-end="url(#ahG)"/>${txt(150 - 12, mid - lenF + 10, 'F浮 = ' + f2(c.F) + ' N', 'ok b', 'end')}` : ''}
+        ${txt(150, 20, c.state === '漂浮' ? '🛟 漂浮：F浮 = G' : c.state === '悬浮' ? '🫧 悬浮：F浮 = G' : '⬇ 沉底：F浮 < G', c.state === '下沉（沉底）' ? 'r b' : 'ok b')}
+      </svg>`;
+    },
+    read(s) {
+      const c = buoyCalc(s);
+      return [['重力 G', f2(c.G) + ' N', 'r'], ['浮力 F浮', f2(c.F) + ' N', 'ok'], ['V排', Math.round(c.Vp) + ' cm³', 'bl']];
+    },
+    tip(s) {
+      const c = buoyCalc(s);
+      return `物块体积 100 cm³。ρ物 ${c.ro.toFixed(1)} ${c.ro < c.rl ? '<' : c.ro === c.rl ? '=' : '>'} ρ液 ${c.rl.toFixed(1)} → <b>${c.state}</b>。F浮 = ρ液gV排 = ${c.rl.toFixed(1)}×10³ kg/m³ × 10 N/kg × ${Math.round(c.Vp)}×10⁻⁶ m³ = ${f2(c.F)} N${c.N ? `，容器底支持力 ${f2(c.N)} N` : ''}。`;
+    },
+    tasks: [
+      { t: '让物块在<b>水</b>中<b>悬浮</b>', hint: '悬浮时 ρ物 = ρ液', check: s => s.liq === 'water' && s.rho === 10 },
+      { t: '在<b>盐水</b>中让物块漂浮，并且<b>一半</b>露出液面', hint: 'V排 / V物 = ρ物 / ρ液 = 1/2', check: s => s.liq === 'salt' && s.rho === 6 },
+      { t: '让物块在<b>酒精</b>中沉底，看看浮力是多少', hint: 'ρ物 > 0.8 g/cm³ 就会下沉', check: s => s.liq === 'alc' && s.rho > 8 },
+    ],
+  };
+
+  /* =========================================================
+   * 5. 欧姆定律电路
+   * ========================================================= */
+  const ohmCalc = s => { const I = s.U / (s.R + s.P); return { I, UR: I * s.R, UP: I * s.P }; };
+  const ohm = {
+    id: 'ohm', emoji: '⚡', name: '欧姆定律电路', ch: 'ohm', cls: 't4',
+    desc: '调电源、电阻和滑动变阻器，读电流表、电压表',
+    init: () => ({ U: 3, R: 10, P: 10 }),
+    ctrls: [
+      { type: 'seg', key: 'U', label: '电源电压', opts: [[1.5, '1.5 V'], [3, '3 V'], [4.5, '4.5 V'], [6, '6 V']] },
+      { type: 'seg', key: 'R', label: '定值电阻 R', opts: [[5, '5 Ω'], [10, '10 Ω'], [15, '15 Ω'], [20, '20 Ω']] },
+      { type: 'range', key: 'P', label: '变阻器接入 R滑', min: 0, max: 20, step: 1, fmt: v => v + ' Ω' },
+    ],
+    draw(s) {
+      const c = ohmCalc(s), dur = clamp(0.5 / c.I, 0.35, 8).toFixed(2), cells = Math.round(s.U / 1.5);
+      const sx = 220 - s.P / 20 * 100;  // 滑片位置：接入的是滑片右边那段电阻丝
+      let bat = '';
+      for (let k = 0; k < cells; k++) { const y = 82 + k * 12; bat += `<line x1="26" y1="${y}" x2="54" y2="${y}" stroke="#2d3047" stroke-width="2.5"/><line x1="33" y1="${y + 5}" x2="47" y2="${y + 5}" stroke="#2d3047" stroke-width="5"/>`; }
+      const by2 = 82 + cells * 12;
+      return `<svg viewBox="0 0 340 214" class="sim-svg">${arrowDefs}
+        <rect width="340" height="214" fill="#fbfdff"/>
+        <g fill="none" stroke="#2d3047" stroke-width="2.5">
+          <path d="M40,82 L40,36 L142,36"/><path d="M178,36 L280,36 L280,74"/><path d="M280,138 L280,176 L220,176"/><path d="M110,150 L110,176 L40,176 L40,${by2}"/>
+          <path d="M280,56 L318,56 L318,88"/><path d="M318,124 L318,158 L280,158"/>
+        </g>
+        <path d="M40,82 L40,36 L280,36 L280,176 L220,176 M${sx},164 L${sx},150 L110,150 L110,176 L40,176 L40,${by2}" fill="none" stroke="#ffb400" stroke-width="3.5" stroke-dasharray="3 13" class="flow" style="animation-duration:${dur}s" stroke-linecap="round" opacity=".9"/>
+        ${bat}
+        ${txt(14, 96, '+', 'r b')}${txt(62, by2 + 2, '电源', 'm', 'start')}
+        <circle cx="160" cy="36" r="17" fill="#fff" stroke="#2d3047" stroke-width="2.5"/>${txt(160, 42, 'A', 'b big')}
+        <rect x="270" y="74" width="20" height="64" fill="#fff" stroke="#2d3047" stroke-width="2.5"/>${txt(258, 110, 'R', 'b', 'end')}
+        <circle cx="318" cy="106" r="17" fill="#fff" stroke="#2d3047" stroke-width="2.5"/>${txt(318, 112, 'V', 'b big')}
+        <rect x="120" y="168" width="100" height="16" fill="#fff" stroke="#2d3047" stroke-width="2.5"/>
+        <path d="M120,176 ${Array.from({ length: 10 }, (_, k) => `L${125 + k * 10},170 L${130 + k * 10},182`).join(' ')} L220,176" fill="none" stroke="#b07a3c" stroke-width="1.4"/>
+        <path d="M110,150 L${sx},150 L${sx},164" fill="none" stroke="#2f7cf6" stroke-width="2.5" marker-end="url(#ahB)"/>
+        <rect x="${sx - 5}" y="${144}" width="10" height="8" rx="2" fill="#2f7cf6"/>
+        ${txt(170, 204, '滑动变阻器（滑片右边一段接入）', 'm')}
+        <path d="M70,36 L100,36" stroke="#e8505b" stroke-width="2" marker-end="url(#ahR)"/>${txt(86, 28, 'I', 'r b')}
+      </svg>`;
+    },
+    read(s) {
+      const c = ohmCalc(s);
+      return [['电流表 I', f2(c.I) + ' A', 'r'], ['电压表 U_R', f2(c.UR) + ' V', 'bl'], ['变阻器 U滑', f2(c.UP) + ' V', 'o']];
+    },
+    tip(s) {
+      const c = ohmCalc(s);
+      return `串联：I = U / (R + R滑) = ${s.U} V ÷ (${s.R} Ω + ${s.P} Ω) = <b>${f2(c.I)} A</b>；U_R = IR = ${f2(c.UR)} V。<br><small>黄点表示电流方向（电源外部从正极流向负极），流得越快电流越大。</small>`;
+    },
+    tasks: [
+      { t: '电源 <b>3 V</b>、R = <b>10 Ω</b>，调变阻器让电流表示数为 <b>0.20 A</b>', hint: '总电阻 R总 = U / I = 15 Ω', check: s => s.U === 3 && s.R === 10 && s.P === 5 },
+      { t: '电源 <b>6 V</b>，让电压表（R 两端）示数为 <b>3.00 V</b>', hint: '串联分压：U_R : U滑 = R : R滑', check: s => s.U === 6 && s.P === s.R },
+      { t: '让电流表示数达到最大值 <b>1.20 A</b>', hint: '电压最大、总电阻最小', check: s => s.U === 6 && s.R === 5 && s.P === 0 },
+    ],
+  };
+
+  const SIMS = [light, lens, lever, buoy, ohm];
+  const BY = Object.fromEntries(SIMS.map(s => [s.id, s]));
+  let prog = store.get('wl_sim', {});   // id -> 已完成任务数组 [true,...]
+  const doneN = id => (prog[id] || []).filter(Boolean).length;
+  const totalTasks = SIMS.reduce((a, s) => a + s.tasks.length, 0);
+
+  /* ---------- 菜单 ---------- */
+  function openLab() {
+    C.stopAll(); C.setView('lab'); C.setBrand('🔬 物理实验室');
+    $('#labMenu').innerHTML = SIMS.map(s => {
+      const d = doneN(s.id), n = s.tasks.length;
+      return `<button class="game-tile ${s.cls}" data-sim="${s.id}"><div class="gt-emoji">${s.emoji}</div><div class="gt-body"><div class="gt-name">${s.name}</div><div class="gt-desc">${s.desc}</div></div><div class="gt-best">${d === n ? '🏅 ' : ''}${d}/${n}</div></button>`;
+    }).join('');
+    C.show('scrLab');
+  }
+  $('#labMenu').addEventListener('click', e => { const t = e.target.closest('[data-sim]'); if (t) { SFX.tap(); openSim(t.dataset.sim, 'lab'); } });
+
+  /* ---------- 模拟页 ---------- */
+  let cur = null, st = null, from = 'lab', ti = 0, armed = false, celebrating = false;
+  function openSim(id, src) {
+    C.stopAll(); $('#modal').hidden = true;
+    cur = BY[id]; from = src || 'lab'; st = cur.init(); armed = false; celebrating = false;
+    C.setView('sim'); C.setBrand(cur.emoji + ' ' + cur.name);
+    ti = firstTodo();
+    if (ti < cur.tasks.length && cur.tasks[ti].setup) cur.tasks[ti].setup(st);
+    buildCtrls(); update(); C.show('scrSim');
+  }
+  const firstTodo = () => { const p = prog[cur.id] || []; let i = 0; while (i < cur.tasks.length && p[i]) i++; return i; };
+  function buildCtrls() {
+    $('#simCtrl').innerHTML = cur.ctrls.map(c => {
+      if (c.type === 'range') return `<div class="sc-row"><div class="sc-l">${c.label}<b data-out="${c.key}"></b></div><input type="range" data-k="${c.key}" min="${c.min}" max="${c.max}" step="${c.step}"></div>`;
+      if (c.type === 'seg') return `<div class="sc-row"><div class="sc-l">${c.label}</div><div class="seg" data-seg="${c.key}">${c.opts.map(([v, l]) => `<button data-v="${v}">${l}</button>`).join('')}</div></div>`;
+      return `<div class="sc-row step"><div class="sc-l">${c.label}</div><div class="stepper"><button data-st="${c.key}" data-d="-1">−</button><b data-out="${c.key}"></b><button data-st="${c.key}" data-d="1">＋</button></div></div>`;
+    }).join('');
+  }
+  function syncCtrls() {
+    cur.ctrls.forEach(c => {
+      const out = $(`[data-out="${c.key}"]`, $('#simCtrl')); if (out) out.textContent = c.fmt(st[c.key]);
+      const r = $(`input[data-k="${c.key}"]`); if (r && +r.value !== st[c.key]) r.value = st[c.key];
+      $$(`[data-seg="${c.key}"] button`).forEach(b => b.classList.toggle('on', String(st[c.key]) === b.dataset.v));
+    });
+  }
+  function change(key, v) { if (st[key] === v) return; st[key] = v; armed = true; update(); }
+  $('#simCtrl').addEventListener('input', e => { const r = e.target.closest('input[data-k]'); if (r) change(r.dataset.k, +r.value); });
+  $('#simCtrl').addEventListener('click', e => {
+    const sb = e.target.closest('.seg button');
+    if (sb) { SFX.tap(); const key = sb.parentNode.dataset.seg, c = cur.ctrls.find(x => x.key === key); const v = c.opts.find(o => String(o[0]) === sb.dataset.v)[0]; return change(key, v); }
+    const pb = e.target.closest('[data-st]');
+    if (pb) { SFX.tap(); const c = cur.ctrls.find(x => x.key === pb.dataset.st); change(c.key, clamp(st[c.key] + +pb.dataset.d, c.min, c.max)); }
+  });
+  function update() {
+    syncCtrls();
+    $('#simStage').innerHTML = cur.draw(st);
+    $('#simRead').innerHTML = cur.read(st).map(([k, v, c]) => `<div class="sr ${c}"><span>${k}</span><b>${v}</b></div>`).join('');
+    $('#simTips').innerHTML = '💡 ' + cur.tip(st);
+    drawTask();
+    if (armed && !celebrating && ti < cur.tasks.length && cur.tasks[ti].check(st, cur)) complete();
+  }
+  function drawTask(justDone) {
+    const n = cur.tasks.length, p = prog[cur.id] || [];
+    const dots = cur.tasks.map((_, k) => `<span class="td${p[k] ? ' on' : ''}${k === ti && !justDone ? ' cur' : ''}"></span>`).join('');
+    let body;
+    if (justDone) body = `<div class="tk-t okc">✅ 任务完成！${justDone}</div>`;
+    else if (ti >= n) body = `<div class="tk-t">🏅 全部任务完成！可以自由探究，或 <button class="btn mini" id="simReset">重做任务</button></div>`;
+    else body = `<div class="tk-t">🎯 任务 ${ti + 1}/${n}：${cur.tasks[ti].t}</div><details class="tk-h"><summary>💭 提示</summary>${cur.tasks[ti].hint}</details>`;
+    $('#simTask').innerHTML = `<div class="tk-dots">${dots}</div>${body}`;
+    const rs = $('#simReset'); if (rs) rs.onclick = () => { prog[cur.id] = []; store.set('wl_sim', prog); ti = 0; armed = false; if (cur.tasks[0].setup) { cur.tasks[0].setup(st); } update(); };
+  }
+  function complete() {
+    celebrating = true;
+    const p = prog[cur.id] || []; p[ti] = true; prog[cur.id] = p; store.set('wl_sim', prog);
+    C.record(true);
+    SFX.clear();
+    const all = doneN(cur.id) === cur.tasks.length;
+    drawTask(all ? '这个实验的徽章到手 🏅' : '');
+    $('#simTask').classList.remove('pop'); void $('#simTask').offsetWidth; $('#simTask').classList.add('pop');
+    toast(all ? '🏅 实验全部完成！' : '✅ 任务完成！');
+    setTimeout(() => {
+      if (!cur) return;
+      celebrating = false; armed = false;
+      ti = firstTodo();
+      if (ti < cur.tasks.length && cur.tasks[ti].setup) cur.tasks[ti].setup(st);
+      update();
+    }, 1400);
+  }
+  function simBack() { const f = from; cur = null; if (f.startsWith('chapter:')) W.openChapter(f.slice(8)); else openLab(); }
+
+  W.openLab = openLab; W.openSim = openSim; W.simBack = simBack;
+  W.labSummary = () => { const d = SIMS.reduce((a, s) => a + doneN(s.id), 0); return d ? `🏅 ${d}/${totalTasks}` : ''; };
+  W.sim = { SIMS, debug: () => ({ id: cur && cur.id, st, ti, celebrating, armed }), set: change };
+  C.refreshMenu();
+})();
+</script>
+</body>
+</html>

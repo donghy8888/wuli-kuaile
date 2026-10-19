@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#2f7cf6">
+<title>快乐掌握物理 · 初中物理闯关</title>
+<meta name="description" content="初中物理闯关小游戏：19 章闯关、物理实验室模拟、公式抢答、单位连连看、错题本">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="wuli.css">
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <button class="icon-btn" id="btnHome" aria-label="返回" hidden>🏠</button>
+    <div class="brand" id="brand">⚛️ 快乐掌握物理</div>
+    <button class="icon-btn" id="btnMute" aria-label="静音切换">🔊</button>
+  </header>
+
+  <!-- 首页 -->
+  <section class="screen active" id="scrHome">
+    <div class="hero">
+      <div class="hero-title">快乐掌握<span>物理</span></div>
+      <div class="hero-sub">闯关 · 做实验 · 记公式，物理原来这么好玩 ✨</div>
+    </div>
+
+    <div class="stats-strip">
+      <div class="ss"><b id="stStars">0</b><span>⭐ 星星</span></div>
+      <div class="ss"><b id="stStreak">0</b><span>🔥 连续天数</span></div>
+      <div class="ss"><b id="stDone">0</b><span>📝 答题数</span></div>
+      <div class="ss"><b id="stAcc">-</b><span>🎯 正确率</span></div>
+    </div>
+
+    <div class="settings card-panel">
+      <div class="set-row">
+        <span class="set-label">⏱ 限时时长</span>
+        <div class="seg" id="segTime">
+          <button data-v="30">30秒</button><button data-v="60">60秒</button><button data-v="90">90秒</button><button data-v="120">120秒</button>
+        </div>
+      </div>
+      <div class="set-row">
+        <span class="set-label">📚 题目范围</span>
+        <div class="seg" id="segScope">
+          <button data-v="all">全部</button><button data-v="8a">八上</button><button data-v="8b">八下</button><button data-v="9">九年级</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="menu" id="menu">
+      <button class="game-tile t1" data-game="map">
+        <div class="gt-emoji">🗺️</div>
+        <div class="gt-body"><div class="gt-name">章节闯关</div><div class="gt-desc">19 章知识点卡 + 闯关题，答得好拿 3 颗星</div></div>
+        <div class="gt-best" id="mapBest"></div>
+      </button>
+      <button class="game-tile t6" data-game="lab">
+        <div class="gt-emoji">🔬</div>
+        <div class="gt-body"><div class="gt-name">物理实验室 <span class="new-badge">NEW</span></div><div class="gt-desc">拖一拖、调一调：光的反射折射、凸透镜、杠杆、浮力、欧姆定律</div></div>
+        <div class="gt-best" id="labBest"></div>
+      </button>
+      <button class="game-tile t3" data-game="rush">
+        <div class="gt-emoji">⚡</div>
+        <div class="gt-body"><div class="gt-name">公式抢答</div><div class="gt-desc">公式、单位、常数换算，限时快答</div></div>
+        <div class="gt-best" data-best="rush"></div>
+      </button>
+      <button class="game-tile t2" data-game="match">
+        <div class="gt-emoji">🔗</div>
+        <div class="gt-body"><div class="gt-name">单位连连看</div><div class="gt-desc">物理量 ↔ 单位，限时配对</div></div>
+        <div class="gt-best" data-best="match"></div>
+      </button>
+      <button class="game-tile t7" data-game="blitz">
+        <div class="gt-emoji">⏱️</div>
+        <div class="gt-body"><div class="gt-name">限时大乱斗</div><div class="gt-desc">所选范围内的题目随机出，比比谁答得多</div></div>
+        <div class="gt-best" data-best="blitz"></div>
+      </button>
+      <button class="game-tile t4" data-game="wrongbook">
+        <div class="gt-emoji">📒</div>
+        <div class="gt-body"><div class="gt-name">错题本</div><div class="gt-desc">答错的题自动收进来，练对就移除</div></div>
+        <div class="gt-best" id="wbCount"></div>
+      </button>
+      <button class="game-tile t5" data-game="cards">
+        <div class="gt-emoji">📜</div>
+        <div class="gt-body"><div class="gt-name">公式卡片</div><div class="gt-desc">全部公式和单位一页看完</div></div>
+      </button>
+    </div>
+    <footer class="foot">按人教版初中物理章节编写 · 进度保存在本机浏览器里 · 计算题按题目给的 g 值计算</footer>
+  </section>
+
+  <!-- 共用 HUD -->
+  <div class="hud" id="hud" hidden>
+    <div class="hud-item"><div class="hud-k">得分</div><div class="hud-v" id="hudScore">0</div></div>
+    <div class="hud-item"><div class="hud-k">连击</div><div class="hud-v" id="hudCombo">0</div></div>
+    <div class="hud-item timer"><div class="hud-k" id="hudTimeK">时间</div><div class="hud-v" id="hudTime">60</div></div>
+    <div class="timebar"><div id="timebarFill"></div></div>
+  </div>
+
+  <!-- 章节地图 -->
+  <section class="screen" id="scrMap">
+    <div class="lab-hero"><div class="lab-hero-t map-t">🗺️ 章节闯关</div><div class="lab-hero-s">每章先看知识卡，再闯关；正确率越高星星越多</div></div>
+    <div id="mapList"></div>
+  </section>
+
+  <!-- 章节详情：知识卡 -->
+  <section class="screen" id="scrChapter">
+    <div class="ch-head card-panel">
+      <div class="ch-emoji" id="chEmoji"></div>
+      <div class="ch-info"><div class="ch-no" id="chNo"></div><div class="ch-name" id="chName"></div><div class="ch-stars" id="chStars"></div></div>
+    </div>
+    <h3 class="sec-h">📌 知识要点</h3>
+    <div class="kp-list" id="chPoints"></div>
+    <h3 class="sec-h" id="chFormH">🧮 公式与单位</h3>
+    <div class="fc-list" id="chForms"></div>
+    <div class="ch-actions">
+      <button class="btn primary big" id="btnChStart">🚀 开始闯关</button>
+      <button class="btn" id="btnChSim" hidden>🔬 去做实验</button>
+    </div>
+  </section>
+
+  <!-- 答题（闯关 / 大乱斗 / 抢答 / 错题练习共用） -->
+  <section class="screen" id="scrQuiz" data-hud="1">
+    <div class="q-card card-panel" id="qCard">
+      <div class="q-tag" id="qTag"></div>
+      <div class="q-text" id="qText"></div>
+    </div>
+    <div class="ph-opts" id="qOpts"></div>
+    <div class="num-wrap" id="numWrap" hidden>
+      <div class="num-show"><span id="numVal" class="num-val"></span><span class="num-unit" id="numUnit"></span></div>
+      <div class="numpad" id="numpad"></div>
+    </div>
+    <div class="ph-note" id="qNote"></div>
+    <button class="btn primary ph-next" id="qNext" hidden>下一题 ▶</button>
+  </section>
+
+  <!-- 单位连连看 -->
+  <section class="screen" id="scrMatch" data-hud="1">
+    <div class="match-tip">点一个物理量，再点它的国际单位！清空一版 +5 秒</div>
+    <div class="match-grid" id="matchGrid"></div>
+  </section>
+
+  <!-- 实验室菜单 -->
+  <section class="screen" id="scrLab">
+    <div class="lab-hero"><div class="lab-hero-t">🔬 物理实验室</div><div class="lab-hero-s">动手调参数，完成任务拿徽章</div></div>
+    <div class="menu" id="labMenu"></div>
+    <footer class="foot">模拟中的数据取 g = 10 N/kg；示意图不按真实比例。</footer>
+  </section>
+
+  <!-- 实验模拟 -->
+  <section class="screen" id="scrSim">
+    <div class="sim-task card-panel" id="simTask"></div>
+    <div class="sim-stage card-panel" id="simStage"></div>
+    <div class="sim-read" id="simRead"></div>
+    <div class="sim-ctrl" id="simCtrl"></div>
+    <div class="sim-tips" id="simTips"></div>
+  </section>
+
+  <!-- 错题本 -->
+  <section class="screen" id="scrWrong">
+    <div class="wb-head card-panel">
+      <div>📒 错题本 <small id="wbSub"></small></div>
+      <div class="wb-actions">
+        <button class="btn primary" id="btnWbPractice">🎯 练错题</button>
+        <button class="btn ghost" id="btnWbClear">清空</button>
+      </div>
+    </div>
+    <div class="wb-lab-list" id="wbList"></div>
+  </section>
+
+  <!-- 公式卡片 -->
+  <section class="screen" id="scrCards">
+    <div id="cardsList"></div>
+  </section>
+
+  <!-- 结算弹窗 -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box">
+      <div class="m-title" id="mTitle">时间到！</div>
+      <div class="m-stars" id="mStars" hidden></div>
+      <div class="m-record" id="mRecord" hidden>🏆 新纪录！</div>
+      <div class="m-stats" id="mStats"></div>
+      <div class="m-miss" id="mMiss"></div>
+      <div class="m-btns">
+        <button class="btn primary" id="btnNextLv" hidden>下一章 ▶</button>
+        <button class="btn primary" id="btnAgain">再来一局</button>
+        <button class="btn" id="btnToWrong">错题本</button>
+        <button class="btn ghost" id="btnToHome">返回</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <div class="countdown" id="countdown" hidden></div>
+</div>
+<script src="data.js"></script>
+<script src="audio.js"></script>
+<script src="app.js"></script>
+<script src="sim.js"></script>
+</body>
+</html>
