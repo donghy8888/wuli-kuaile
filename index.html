@@ -9,6 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚛️</text></svg>">
 <link rel="stylesheet" href="style.css">
 <link rel="stylesheet" href="wuli.css">
+<link rel="stylesheet" href="slice.css">
 </head>
 <body>
 <div id="app">
@@ -53,6 +54,11 @@
         <div class="gt-emoji">🗺️</div>
         <div class="gt-body"><div class="gt-name">章节闯关</div><div class="gt-desc">19 章知识点卡 + 闯关题，答得好拿 3 颗星</div></div>
         <div class="gt-best" id="mapBest"></div>
+      </button>
+      <button class="game-tile t8" data-game="slice">
+        <div class="gt-emoji">🍉</div>
+        <div class="gt-body"><div class="gt-name">切西瓜复习 <span class="new-badge">NEW</span></div><div class="gt-desc" id="sliceDesc">今天复习过的公式和知识点变成西瓜，切出正确答案！</div></div>
+        <div class="gt-best" id="sliceBest"></div>
       </button>
       <button class="game-tile t6" data-game="lab">
         <div class="gt-emoji">🔬</div>
@@ -207,5 +213,7 @@
 <script src="audio.js"></script>
 <script src="app.js"></script>
 <script src="sim.js"></script>
+<script src="slice.js"></script>
+<script src="slicegame.js"></script>
 </body>
 </html>

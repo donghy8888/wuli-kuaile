@@ -31,6 +31,21 @@
     if (stat.last !== today) { stat.streak = stat.last === yest ? stat.streak + 1 : 1; stat.last = today; }
     store.set('wl_stat', stat);
   }
+  /* 今日复习记录（切西瓜复习游戏的题源）：wl_today = {d, f:{公式id:次数}, c:{章节id:次数}, k:{常数id:次数}}；wl_freq 为累计次数 */
+  function track(kind, id) {
+    if (!id) return;
+    const d = dayStr(Date.now());
+    let t = store.get('wl_today', null); if (!t || t.d !== d) t = { d, f: {}, c: {}, k: {} };
+    t[kind][id] = (t[kind][id] || 0) + 1; store.set('wl_today', t);
+    const fq = store.get('wl_freq', { f: {}, c: {}, k: {} }); fq[kind] = fq[kind] || {}; fq[kind][id] = (fq[kind][id] || 0) + 1; store.set('wl_freq', fq);
+  }
+  function trackQ(q) {
+    if (!q || !q.id) return;
+    const m = /^d[bt]-([A-Za-z]+)-/.exec(q.id);
+    if (m) return track('f', m[1]);
+    if (/^fact-/.test(q.id)) return track('k', q.id);
+    if (CH[q.ch]) track('c', q.ch);
+  }
   const inScope = g => settings.scope === 'all' || g === settings.scope;
 
   let toastTimer;
@@ -327,7 +342,7 @@
       else if (busy && (e.key === 'Enter' || e.key === ' ') && !$('#qNext').hidden) $('#qNext').click();
     };
     function judge(ok) {
-      record(ok);
+      record(ok); trackQ(cur);
       const corr = cur.t === 'c' ? '' : cur.t === 'tf' ? '' : `正确答案：<b>${cur.ans} ${cur.unit}</b>　`;
       if (ok) {
         right++; hud.add(timed ? 10 : 10); SFX.ding(hud.combo);
@@ -442,7 +457,7 @@
   }
   function openChapter(id) {
     stopAll(); $('#modal').hidden = true;
-    const c = CH[id]; view = 'chapter'; viewArg = id;
+    const c = CH[id]; view = 'chapter'; viewArg = id; track('c', id);
     setBrand(`${c.emoji} ${c.name}`);
     $('#chEmoji').textContent = c.emoji;
     $('#chNo').textContent = `第 ${c.no} 章 · ${GRADES.find(g => g.id === c.grade).name} · ${c.qs.length} 道题`;
@@ -498,6 +513,7 @@
     $('#stAcc').textContent = stat.done ? Math.round(stat.right / stat.done * 100) + '%' : '-';
     const n = Object.keys(wrongBook).length;
     $('#wbCount').textContent = n ? n + ' 题' : '';
+    if (window.WL && window.WL.sliceSummary) $('#sliceBest').innerHTML = window.WL.sliceSummary();
     if (window.WL && window.WL.labSummary) $('#labBest').textContent = window.WL.labSummary();
   }
   function goHome() { stopAll(); view = 'home'; $('#modal').hidden = true; refreshMenu(); setBrand('⚛️ 快乐掌握物理'); show('scrHome'); }
@@ -520,6 +536,7 @@
     if (name === 'wrongbook') return openWrong();
     if (name === 'cards') { view = 'cards'; renderCards(); setBrand('📜 公式卡片'); return show('scrCards'); }
     if (name === 'lab') return window.WL.openLab();
+    if (name === 'slice') return window.WL.openSlice();
     if (name === 'rush' || name === 'blitz') return startQuiz({ mode: name });
     if (name === 'drill-blank' || name === 'drill-transform' || name === 'drill-mix') return startQuiz({ mode: name });
     if (name === 'match') { view = 'game'; setBrand('🔗 单位连连看'); show('scrMatch'); current = new MatchGame(); window.WL.game = current; current.start(); }
@@ -549,7 +566,7 @@
 
   window.WL = {
     data: window.PHY, startGame, startQuiz, openChapter, goHome,
-    core: { $, $$, rand, shuffle, store, toast, show, setBrand, stopAll, record, refreshMenu, setView(v) { view = v; } },
+    core: { $, $$, rand, shuffle, store, toast, show, setBrand, stopAll, record, refreshMenu, addWrong, dayStr, track, CH, setView(v) { view = v; } },
   };
   drawMute();
   refreshMenu();
