@@ -172,3 +172,12 @@ html,body{overflow-x:hidden}
 .de-sub{font-size:13px;color:var(--muted);margin:4px 0 12px}
 .de-btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
 .de-btns .btn{min-width:42%}
+
+/* 动手组装：透镜托盘 */
+.tray-row .sc-l{margin-bottom:6px}
+.tray{display:flex;flex-wrap:wrap;gap:8px}
+.tray-chip{padding:10px 12px;border-radius:14px;background:#fff;border:2px solid #d5dceb;font-weight:800;font-size:13px;color:#2d3047;box-shadow:0 2px 0 rgba(45,48,71,.08)}
+.tray-chip.on{border-color:#2f7cf6;background:#e8f1ff;color:#1f5bb8;box-shadow:0 0 0 3px rgba(47,124,246,.18)}
+.sc-note{font-size:13px;color:#7a7f9a;line-height:1.5;padding:4px 2px}
+.t9 .gt-emoji{background:#e8fff0}.t10 .gt-emoji{background:#e8f0ff}.t11 .gt-emoji{background:#f0e8ff}
+.sim-svg [data-drag]{touch-action:none}

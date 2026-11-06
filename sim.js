@@ -304,7 +304,355 @@
     ],
   };
 
-  const SIMS = [light, lens, lever, buoy, ohm];
+
+  /* =========================================================
+   * 6. 放大镜（单凸透镜 → 引出显微镜）
+   * ========================================================= */
+  const magImg = (u, f) => {
+    if (u === f) return { none: true, kind: '不成像', m: 0, v: 0, real: false };
+    const v = u * f / (u - f), m = Math.abs(v / u);
+    if (v < 0) return { v, m, real: false, kind: '正立、放大的虚像', size: '放大' };
+    const size = u > 2 * f ? '缩小' : u === 2 * f ? '等大' : '放大';
+    return { v, m, real: true, size, kind: `倒立、${size}的实像` };
+  };
+  const magnifier = {
+    id: 'magnifier', emoji: '🔎', name: '放大镜', ch: 'lens', cls: 't9',
+    desc: '动手调物距：一倍焦距内成正立放大虚像；再看看为什么还要显微镜',
+    init: () => ({ f: 10, u: 6, mode: 'single' }),
+    ctrls: [
+      { type: 'tray', key: 'f', label: '① 选一块凸透镜当放大镜', opts: [[8, 'f=8 cm', '短一点，放大倍数大'], [10, 'f=10 cm', '常用焦距'], [15, 'f=15 cm', '长一点，视野更宽']] },
+      { type: 'range', key: 'u', label: '② 拖动物体（物距 u）', min: 3, max: 30, step: 1, fmt: v => v + ' cm' },
+      { type: 'seg', key: 'mode', label: '③ 探究模式', opts: [['single', '🔎 单透镜'], ['compare', '🔬 对比显微镜']] },
+    ],
+    draw(s) {
+      const f = s.f, u = s.u, k = 4.2, X = 168, Y = 100, h = 28;
+      const im = magImg(u, f), x0 = X - u * k, ty = Y - h;
+      const mark = (x, l) => `<line x1="${x}" y1="${Y - 4}" x2="${x}" y2="${Y + 4}" stroke="#2d3047" stroke-width="2"/>` + txt(x, Y + 16, l, 'm');
+      let rays = '', img = '', note = '';
+      const ext = (x1, y1, x2, y2, toX) => { const t = (toX - x1) / (x2 - x1); return [toX, y1 + (y2 - y1) * t]; };
+      if (im.none) {
+        const e1 = ext(X, ty, X + f * k, Y, 340);
+        rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, 340, Y + (Y - ty) * (340 - X) / (X - x0), '#00a37a');
+        note = txt(250, 28, '折射光平行，不成像', 'm');
+      } else if (!im.real) {
+        const xi = X + im.v * k, yi = Y - h * im.m;
+        const e1 = ext(X, ty, X + f * k, Y, 340), e2 = ext(x0, ty, X, Y, 340);
+        rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, e2[0], e2[1], '#00a37a')
+          + `<line x1="${X}" y1="${ty}" x2="${xi}" y2="${yi}" stroke="#ff9f1a" stroke-width="1.5" stroke-dasharray="4 4"/>`
+          + `<line x1="${x0}" y1="${ty}" x2="${xi}" y2="${yi}" stroke="#00a37a" stroke-width="1.5" stroke-dasharray="4 4"/>`;
+        if (xi > 8) img = `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${yi}" stroke="#e8505b" stroke-width="3" stroke-dasharray="5 4" marker-end="url(#ahR)"/>` + txt(xi, Math.max(yi - 6, 14), '虚像', 'r');
+      } else {
+        const xi = X + im.v * k, yi = Y + h * im.m;
+        const e1 = ext(X, ty, xi, yi, 340), e2 = ext(x0, ty, xi, yi, 340);
+        rays = ray(x0, ty, X, ty, '#ff9f1a') + ray(X, ty, e1[0], e1[1], '#ff9f1a') + ray(x0, ty, e2[0], e2[1], '#00a37a');
+        if (xi < 330) img = `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${yi}" stroke="#e8505b" stroke-width="3.5" marker-end="url(#ahR)"/>` + txt(xi, Math.min(yi + 14, 190), '实像', 'r');
+        else note = txt(330, 28, '像在很远处 →', 'r', 'end');
+      }
+      const sharp = !im.none && !im.real && u < f;
+      const preview = s.mode === 'single'
+        ? `<g transform="translate(248,8)">
+            <rect width="86" height="86" rx="43" fill="#1a2030" stroke="#445" stroke-width="3"/>
+            <circle cx="43" cy="43" r="36" fill="#0d1520"/>
+            ${sharp
+              ? `<text x="43" y="38" text-anchor="middle" font-size="${18 + Math.min(im.m, 3) * 6}">🐜</text>
+                 <text x="43" y="62" text-anchor="middle" fill="#9fef9f" font-size="10" font-weight="800">清晰 ×${f1(im.m)}</text>`
+              : `<text x="43" y="40" text-anchor="middle" font-size="14" opacity=".35" filter="url(#blur)">🐜</text>
+                 <text x="43" y="62" text-anchor="middle" fill="#ef9f9f" font-size="10" font-weight="800">${im.none ? '不成像' : im.real ? '成实像' : '调进 f 内'}</text>`}
+            ${txt(43, 98, '透过透镜看', 'm')}
+          </g>`
+        : '';
+      const compare = s.mode === 'compare' ? `
+        <g transform="translate(8,8)">
+          <rect width="324" height="54" rx="10" fill="#fff7dd" stroke="#e6d39a"/>
+          <text x="16" y="22" class="st b" text-anchor="start">🔎 放大镜：1 片凸透镜，u&lt;f → 正立放大虚像（倍数有限）</text>
+          <text x="16" y="42" class="st b" text-anchor="start">🔬 显微镜：物镜先成倒立放大实像，目镜再当放大镜 → 总倍数 ≈ 物镜×目镜</text>
+        </g>` : '';
+      return `<svg viewBox="0 0 340 210" class="sim-svg" style="touch-action:none">${arrowDefs}
+        <defs><filter id="blur"><feGaussianBlur stdDeviation="2.2"/></filter></defs>
+        <rect width="340" height="210" fill="#fbfdff"/>
+        <line x1="0" y1="${Y}" x2="340" y2="${Y}" stroke="#9aa3bf" stroke-width="1.5"/>
+        ${mark(X - 2 * f * k, '2F')}${mark(X - f * k, 'F')}${mark(X + f * k, 'F')}${mark(X + 2 * f * k, '2F')}
+        <ellipse cx="${X}" cy="${Y}" rx="10" ry="72" fill="rgba(120,190,255,.4)" stroke="#2f7cf6" stroke-width="2.5"/>
+        ${txt(X, 198, '凸透镜 f=' + f, 'bl')}
+        ${rays}
+        <g data-drag="u" data-map="left" data-px="${k}" data-lensx="${X}" style="cursor:grab">
+          <line x1="${x0}" y1="${Y}" x2="${x0}" y2="${ty}" stroke="#2d3047" stroke-width="4" marker-end="url(#ah)"/>
+          <text x="${x0}" y="${ty - 8}" text-anchor="middle" font-size="18">🐜</text>
+          <circle cx="${x0}" cy="${Y}" r="10" fill="transparent"/>
+        </g>
+        ${img}${note}${preview}${compare}
+        ${txt(170, 16, s.mode === 'compare' ? '放大镜 vs 显微镜' : (sharp ? '✅ 正立放大虚像（放大镜原理）' : '把物体拖进一倍焦距以内'), sharp ? 'ok b' : 'm')}
+      </svg>`;
+    },
+    read(s) {
+      const im = magImg(s.u, s.f);
+      return [['物距 u', s.u + ' cm', ''], ['焦距 f', s.f + ' cm', 'bl'], ['像', im.kind, im.real === false && !im.none ? 'ok' : 'r']];
+    },
+    tip(s) {
+      const im = magImg(s.u, s.f);
+      if (s.mode === 'compare') return '放大镜只有一级放大；观察细胞、细菌等更小的物体，需要<b>两级放大</b>——物镜先成放大实像，目镜再把这幅实像放大，这就是显微镜。去做「🔬 显微镜」实验动手组装吧！';
+      if (im.none) return `u = f = ${s.f} cm：折射光平行射出，不成像。再往里挪一点就成虚像啦。`;
+      if (!im.real) return `<b>u &lt; f</b>：成<b>正立、放大的虚像</b>（虚线是光线反向延长线）。放大倍数约 ×${f1(im.m)}。这就是放大镜！虚像不能用光屏接收。`;
+      return `<b>u &gt; f</b>：成倒立实像（${im.size}）。放大镜要用时，物体必须放在<b>焦点以内</b>。`;
+    },
+    tasks: [
+      { t: '选一块透镜，把蚂蚁拖到<b>一倍焦距以内</b>，看到正立放大虚像', hint: '物距 u 要小于焦距 f；虚像用虚线表示', check: s => s.u < s.f },
+      { t: '换成 <b>f = 8 cm</b> 的透镜，再把物体放在焦点内，体会倍数更大', hint: '焦距越短，同样物距下放大倍数通常更大', check: s => s.f === 8 && s.u < 8 },
+      { t: '把物体拖到 <b>f 以外</b>，观察变成倒立实像（放大镜失效）', hint: 'u > f 就不再是放大镜工作状态', check: s => s.u > s.f },
+      { t: '切换到「对比显微镜」，读懂两级放大的区别', hint: '点一下探究模式里的 🔬 对比显微镜', check: s => s.mode === 'compare' },
+    ],
+  };
+
+  /* =========================================================
+   * 7. 显微镜（动手组装）
+   * ========================================================= */
+  const microCalc = s => {
+    const fo = s.fo, fe = s.fe, u = s.u, L = s.L;
+    if (!fo || !fe) return { ready: false };
+    if (u <= fo) return { ready: true, stage: 'obj-fail', fo, fe, u, reason: '标本太近：u ≤ f物，物镜成虚像，显微镜不这样用' };
+    const v1 = u * fo / (u - fo);
+    const m1 = Math.abs(v1 / u);
+    const ue = L - v1;
+    const labelMo = fo <= 5 ? 20 : fo <= 8 ? 10 : 5;
+    const labelMe = fe <= 10 ? 10 : fe <= 15 ? 5 : 20;
+    let stage, mEye = 0, v2 = 0, total = 0, sharp = false;
+    if (ue <= 0.2) stage = 'too-short';
+    else if (ue < fe - 0.05) {
+      v2 = ue * fe / (ue - fe);
+      mEye = Math.abs(v2 / ue);
+      total = m1 * mEye;
+      stage = 'ok';
+      sharp = ue >= fe * 0.4 && ue <= fe * 0.85;
+    } else if (Math.abs(ue - fe) <= 0.25) stage = 'eye-f';
+    else {
+      stage = 'eye-real';
+      v2 = ue * fe / (ue - fe);
+      mEye = Math.abs(v2 / ue);
+      total = m1 * mEye;
+    }
+    return { ready: true, stage, fo, fe, u, v1, m1, ue, v2, mEye, total, sharp, L, labelMo, labelMe,
+      labelTotal: labelMo * labelMe, objOk: u > fo && u < 2 * fo };
+  };
+  const microscope = {
+    id: 'microscope', emoji: '🔬', name: '显微镜', ch: 'lens', cls: 't10',
+    desc: '从托盘选物镜、目镜，装到光具座上，调物距和镜筒看清标本',
+    init: () => ({ fo: 0, fe: 0, u: 7.5, L: 22 }),
+    ctrls: [
+      { type: 'tray', key: 'fo', label: '① 选物镜（短焦距、高倍）', opts: [[0, '⬜ 未选', ''], [5, '物镜 f=5·20×', '焦距短，放大倍数大'], [8, '物镜 f=8·10×', '常用低倍物镜'], [15, '物镜 f=15·5×', '焦距偏长，不太适合']] },
+      { type: 'tray', key: 'fe', label: '② 选目镜（比物镜稍长）', opts: [[0, '⬜ 未选', ''], [10, '目镜 f=10·10×', '常用'], [15, '目镜 f=15·5×', '稍长'], [5, '目镜 f=5', '与物镜一样短，不典型']] },
+      { type: 'range', key: 'u', label: '③ 拖动标本（物距 u）', min: 3, max: 18, step: 0.1, fmt: v => f1(v) + ' cm' },
+      { type: 'range', key: 'L', label: '④ 调节镜筒长度 L', min: 12, max: 36, step: 0.5, fmt: v => f1(v) + ' cm' },
+      { type: 'note', html: '👆 也可在图上左右拖动标本🐜；物镜短、目镜稍长；标本放在 f～2f，镜筒调到清晰' },
+    ],
+    draw(s) {
+      const c = microCalc(s), Y = 110, k = 5.2, Xo = 100;
+      const Xe = s.fo && s.fe ? Xo + Math.min(s.L, 30) * k * 0.55 : Xo + 110;
+      let lenses = '', rays = '', mid = '', final = '', trayHint = '';
+      if (!s.fo || !s.fe) trayHint = txt(170, 36, '先从下方托盘选出物镜和目镜，装到光具座上', 'm');
+      const tube = s.fo && s.fe ? `<rect x="${Xo + 8}" y="${Y - 28}" width="${Math.max(Xe - Xo - 16, 8)}" height="56" rx="6" fill="rgba(80,100,140,.12)" stroke="#7a8bb0" stroke-width="2" stroke-dasharray="4 3"/>` : '';
+      if (s.fo) {
+        lenses += `<ellipse cx="${Xo}" cy="${Y}" rx="7" ry="48" fill="rgba(80,170,255,.45)" stroke="#1f6fd6" stroke-width="2.5"/>` + txt(Xo, Y + 62, '物镜', 'bl') + txt(Xo, Y + 74, 'f=' + s.fo, 'm');
+        lenses += `<line x1="${Xo - s.fo * k}" y1="${Y - 3}" x2="${Xo - s.fo * k}" y2="${Y + 3}" stroke="#2d3047"/>` + txt(Xo - s.fo * k, Y + 14, 'F', 'm');
+        lenses += `<line x1="${Xo + s.fo * k}" y1="${Y - 3}" x2="${Xo + s.fo * k}" y2="${Y + 3}" stroke="#2d3047"/>`;
+      } else {
+        lenses += `<ellipse cx="${Xo}" cy="${Y}" rx="7" ry="48" fill="rgba(180,180,180,.2)" stroke="#aaa" stroke-width="2" stroke-dasharray="4 3"/>` + txt(Xo, Y + 62, '物镜座', 'm');
+      }
+      if (s.fe) {
+        lenses += `<ellipse cx="${Xe}" cy="${Y}" rx="7" ry="40" fill="rgba(120,210,160,.45)" stroke="#00a37a" stroke-width="2.5"/>` + txt(Xe, Y + 56, '目镜', 'ok') + txt(Xe, Y + 68, 'f=' + s.fe, 'm');
+        lenses += `<line x1="${Xe - s.fe * k * 0.45}" y1="${Y - 3}" x2="${Xe - s.fe * k * 0.45}" y2="${Y + 3}" stroke="#2d3047"/>` + txt(Xe - s.fe * k * 0.45, Y + 14, "F'", 'm');
+      } else {
+        lenses += `<ellipse cx="${Xo + 110}" cy="${Y}" rx="7" ry="40" fill="rgba(180,180,180,.2)" stroke="#aaa" stroke-width="2" stroke-dasharray="4 3"/>` + txt(Xo + 110, Y + 56, '目镜座', 'm');
+      }
+      const xObj = s.fo ? Xo - s.u * k : 36;
+      const specimen = `<g data-drag="u" data-map="left" data-px="${k}" data-lensx="${Xo}" style="cursor:grab">
+        <line x1="${xObj}" y1="${Y}" x2="${xObj}" y2="${Y - 22}" stroke="#2d3047" stroke-width="3" marker-end="url(#ah)"/>
+        <text x="${xObj}" y="${Y - 28}" text-anchor="middle" font-size="16">🐜</text>
+        <circle cx="${xObj}" cy="${Y}" r="12" fill="transparent"/>
+      </g>`;
+      if (c.ready && c.stage !== 'obj-fail' && s.fo && s.fe) {
+        const xi = Xo + Math.min(c.v1, 22) * k * 0.85, hi = Math.min(22 * c.m1, 48), yi = Y + hi;
+        rays = ray(xObj, Y - 22, Xo, Y - 22, '#ff9f1a') + ray(Xo, Y - 22, xi, yi, '#ff9f1a')
+          + ray(xObj, Y - 22, Xo, Y, '#00a37a') + ray(Xo, Y, xi, yi, '#00a37a');
+        mid = `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${yi}" stroke="#e8505b" stroke-width="3" marker-end="url(#ahR)"/>` + txt(xi, yi + 12, '中间实像', 'r');
+        if (c.stage === 'ok') {
+          const xv = Math.max(20, Xe - 55), yv = Y - Math.min(20 + c.mEye * 6, 50);
+          final = `<line x1="${Xe}" y1="${yi}" x2="${xv}" y2="${yv}" stroke="#e8505b" stroke-width="1.6" stroke-dasharray="4 3"/>`
+            + `<line x1="${xv}" y1="${Y}" x2="${xv}" y2="${yv}" stroke="#e8505b" stroke-width="2.5" stroke-dasharray="5 4" marker-end="url(#ahR)"/>`
+            + txt(xv, yv - 6, '虚像(倒立)', 'r');
+        }
+      }
+      const eyeView = (() => {
+        const x = 268, y = 8; let body;
+        if (!s.fo || !s.fe) body = `<text x="43" y="48" text-anchor="middle" fill="#889" font-size="11">先装透镜</text>`;
+        else if (c.stage === 'obj-fail') body = `<text x="43" y="40" text-anchor="middle" font-size="12" opacity=".3">🐜</text><text x="43" y="62" text-anchor="middle" fill="#ef9f9f" font-size="9">标本太近</text>`;
+        else if (c.stage === 'too-short') body = `<text x="43" y="48" text-anchor="middle" fill="#ef9f9f" font-size="10">镜筒太短</text>`;
+        else if (c.stage === 'eye-f' || c.stage === 'eye-real') body = `<text x="43" y="40" text-anchor="middle" font-size="13" opacity=".25" filter="url(#blur)">🐜</text><text x="43" y="62" text-anchor="middle" fill="#efbf6f" font-size="9">调镜筒</text>`;
+        else if (c.stage === 'ok' && c.sharp) body = `<text x="43" y="36" text-anchor="middle" font-size="22" transform="rotate(180 43 32)">🐜</text><text x="43" y="64" text-anchor="middle" fill="#9fef9f" font-size="10" font-weight="800">清晰 · 倒立</text>`;
+        else if (c.stage === 'ok') body = `<text x="43" y="36" text-anchor="middle" font-size="16" opacity=".55" transform="rotate(180 43 32)" filter="url(#blur)">🐜</text><text x="43" y="64" text-anchor="middle" fill="#efbf6f" font-size="9">接近清晰</text>`;
+        else body = `<text x="43" y="48" text-anchor="middle" fill="#889" font-size="11">—</text>`;
+        return `<g transform="translate(${x},${y})"><rect width="86" height="86" rx="43" fill="#1a2030" stroke="#445" stroke-width="3"/><circle cx="43" cy="43" r="36" fill="#0d1520"/>${body}<text x="43" y="98" class="st m" text-anchor="middle">目镜视野</text></g>`;
+      })();
+      const status = !s.fo || !s.fe ? '动手组装：选出物镜 + 目镜'
+        : c.stage === 'ok' && c.sharp ? `✅ 看清了！总放大约 ×${c.labelTotal}（${c.labelMo}×${c.labelMe}）`
+        : c.stage === 'ok' ? '继续微调物距 / 镜筒，让视野清晰'
+        : c.stage === 'obj-fail' ? c.reason
+        : c.stage === 'too-short' ? '拉长镜筒，让中间实像落在目镜焦点以内'
+        : '调节中…';
+      return `<svg viewBox="0 0 360 210" class="sim-svg" style="touch-action:none">${arrowDefs}
+        <defs><filter id="blur"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+        <rect width="360" height="210" fill="#f7fbff"/>
+        <line x1="10" y1="${Y}" x2="250" y2="${Y}" stroke="#9aa3bf" stroke-width="2"/>
+        ${txt(20, Y + 70, '光具座', 'm', 'start')}
+        ${tube}${lenses}${rays}${mid}${final}${specimen}${eyeView}
+        ${txt(130, 16, status, c.sharp ? 'ok b' : 'm')}${trayHint}
+      </svg>`;
+    },
+    read(s) {
+      const c = microCalc(s);
+      if (!c.ready) return [['物镜', '未选', 'r'], ['目镜', '未选', 'r'], ['状态', '组装中', '']];
+      return [
+        ['中间像', c.stage === 'obj-fail' ? '—' : `v₁=${f1(c.v1)} cm`, 'r'],
+        ['目镜物距', c.ue != null ? f1(c.ue) + ' cm' : '—', 'bl'],
+        ['总放大', c.stage === 'ok' ? `≈${c.labelMo}×${c.labelMe}=${c.labelTotal}` : '—', c.sharp ? 'ok' : ''],
+      ];
+    },
+    tip(s) {
+      const c = microCalc(s);
+      if (!s.fo || !s.fe) return '显微镜要两片凸透镜：靠近标本的叫<b>物镜</b>（焦距短），靠近眼睛的叫<b>目镜</b>。先从托盘点选，装到光具座上。';
+      if (c.stage === 'obj-fail') return '标本应放在物镜的 <b>f～2f 之间</b>，才能成倒立、放大的实像（中间像）。';
+      if (c.stage === 'too-short') return `中间实像在物镜右侧 v₁≈${f1(c.v1)} cm，但镜筒 L=${f1(s.L)} cm 太短。把镜筒<b>拉长</b>到大约 ${f1(c.v1 + s.fe * 0.6)} cm。`;
+      if (c.stage === 'ok') return `物镜成<b>倒立放大实像</b>，落在目镜焦点以内；目镜当放大镜。对人眼来说，最终像相对标本是<b>倒立</b>的。总放大倍数 ≈ 物镜倍数 × 目镜倍数 = ${c.labelMo}×${c.labelMe}=<b>${c.labelTotal}</b>。`;
+      return '让中间实像落在目镜的一倍焦距以内，目镜才能当放大镜用。试试缩短一点镜筒。';
+    },
+    tasks: [
+      { t: '从托盘选出合适的<b>物镜</b>（短焦距）和<b>目镜</b>（稍长）', hint: '物镜选 f=5 或 8；目镜选 f=10 或 15（比物镜长）', check: s => s.fo > 0 && s.fo <= 8 && s.fe > 0 && s.fe >= 10 && s.fe > s.fo },
+      { t: '把标本调到物镜的 <b>f～2f</b> 之间，形成倒立放大中间实像', hint: '物距大于 f物、小于 2f物', check: s => { const c = microCalc(s); return c.ready && c.objOk; } },
+      { t: '调节镜筒长度，让中间像落在目镜焦点以内，目镜视野<b>清晰</b>', hint: '镜筒大约 = v₁ + 0.6×f目；看目镜视野变清晰', check: s => { const c = microCalc(s); return c.stage === 'ok' && c.sharp; } },
+      { t: '读出总放大倍数 = 物镜倍数 × 目镜倍数', hint: '看读数区的「总放大」', check: s => { const c = microCalc(s); return c.stage === 'ok' && c.sharp && c.labelTotal >= 50; } },
+    ],
+  };
+
+  /* =========================================================
+   * 8. 望远镜（开普勒式）
+   * ========================================================= */
+  const teleCalc = s => {
+    const fo = s.fo, fe = s.fe, L = s.L;
+    if (!fo || !fe) return { ready: false };
+    const ideal = fo + fe;
+    const focus = Math.abs(L - ideal) <= 0.6;
+    const near = Math.abs(L - ideal) <= 1.5;
+    const M = fo / fe; // 视角放大率
+    let stage = 'defocus';
+    if (L < ideal - 1.5) stage = 'short';
+    else if (L > ideal + 1.5) stage = 'long';
+    else if (focus) stage = 'ok';
+    else stage = 'near';
+    return { ready: true, ideal, focus, near, M, stage, fo, fe, L };
+  };
+  const telescope = {
+    id: 'telescope', emoji: '🔭', name: '望远镜', ch: 'lens', cls: 't11',
+    desc: '选长焦距物镜 + 短焦距目镜，调镜筒 ≈ f物+f目，看视角变大',
+    init: () => ({ fo: 0, fe: 0, L: 20, target: 'moon' }),
+    ctrls: [
+      { type: 'tray', key: 'fo', label: '① 选物镜（要长焦距）', opts: [[0, '⬜ 未选', ''], [16, '物镜 f=16 cm', '长焦距，视角放大大'], [20, '物镜 f=20 cm', '更长'], [5, '物镜 f=5 cm', '太短，像显微镜物镜']] },
+      { type: 'tray', key: 'fe', label: '② 选目镜（要短焦距）', opts: [[0, '⬜ 未选', ''], [2, '目镜 f=2 cm', '短，放大率大'], [4, '目镜 f=4 cm', '常用'], [10, '目镜 f=10 cm', '太长，放大率小']] },
+      { type: 'range', key: 'L', label: '③ 调节镜筒长度 L', min: 8, max: 36, step: 0.5, fmt: v => f1(v) + ' cm' },
+      { type: 'seg', key: 'target', label: '④ 观察目标', opts: [['moon', '🌙 月亮'], ['tower', '🗼 塔'], ['bird', '🐦 鸟']] },
+      { type: 'note', html: '开普勒望远镜：镜筒长 ≈ f物 + f目；成倒立像；视角放大率 ≈ f物 / f目。对比显微镜：显微镜看近处微小物体，望远镜看远处大物体。' },
+    ],
+    draw(s) {
+      const c = teleCalc(s), Y = 108, k = 4.2;
+      const Xo = 70, Xe = s.fo && s.fe ? Xo + s.L * k * 0.7 : Xo + 100;
+      const icons = { moon: '🌙', tower: '🗼', bird: '🐦' };
+      const tip = icons[s.target] || '🌙';
+      let lenses = '', rays = '', preview = '';
+      // distant object rays (parallel)
+      const parallel = `
+        ${ray(8, Y - 28, Xo, Y - 22, '#ff9f1a')}
+        ${ray(8, Y - 8, Xo, Y - 8, '#ff9f1a')}
+        ${ray(8, Y + 12, Xo, Y + 6, '#00a37a')}
+        ${txt(18, Y - 36, '来自远处的近平行光', 'm', 'start')}
+        <text x="22" y="${Y + 40}" font-size="22">${tip}</text>`;
+      if (s.fo) {
+        lenses += `<ellipse cx="${Xo}" cy="${Y}" rx="9" ry="52" fill="rgba(80,170,255,.45)" stroke="#1f6fd6" stroke-width="2.5"/>`
+          + txt(Xo, Y + 66, '物镜', 'bl') + txt(Xo, Y + 78, 'f=' + s.fo, 'm');
+        lenses += `<line x1="${Xo + s.fo * k * 0.55}" y1="${Y - 3}" x2="${Xo + s.fo * k * 0.55}" y2="${Y + 3}" stroke="#2d3047"/>`
+          + txt(Xo + s.fo * k * 0.55, Y + 14, 'F', 'm');
+      } else {
+        lenses += `<ellipse cx="${Xo}" cy="${Y}" rx="9" ry="52" fill="rgba(180,180,180,.2)" stroke="#aaa" stroke-dasharray="4 3" stroke-width="2"/>` + txt(Xo, Y + 66, '物镜座', 'm');
+      }
+      if (s.fe) {
+        lenses += `<ellipse cx="${Xe}" cy="${Y}" rx="6" ry="36" fill="rgba(120,210,160,.45)" stroke="#00a37a" stroke-width="2.5"/>`
+          + txt(Xe, Y + 52, '目镜', 'ok') + txt(Xe, Y + 64, 'f=' + s.fe, 'm');
+      } else {
+        lenses += `<ellipse cx="${Xo + 100}" cy="${Y}" rx="6" ry="36" fill="rgba(180,180,180,.2)" stroke="#aaa" stroke-dasharray="4 3" stroke-width="2"/>` + txt(Xo + 100, Y + 52, '目镜座', 'm');
+      }
+      const tube = s.fo && s.fe ? `<rect x="${Xo + 10}" y="${Y - 30}" width="${Math.max(Xe - Xo - 20, 10)}" height="60" rx="8" fill="rgba(80,100,140,.12)" stroke="#7a8bb0" stroke-width="2"/>`
+        + `<g data-drag="L" data-map="abs" data-px="${k * 0.7}" style="cursor:ew-resize"><rect x="${Xe - 14}" y="${Y - 34}" width="18" height="68" rx="4" fill="rgba(47,124,246,.25)" stroke="#2f7cf6"/></g>` : '';
+      if (c.ready && c.stage === 'ok') {
+        // intermediate image near Fo
+        const xi = Xo + s.fo * k * 0.55;
+        rays = ray(Xo, Y - 22, xi, Y + 18, '#ff9f1a') + ray(Xo, Y + 6, xi, Y + 18, '#00a37a')
+          + `<line x1="${xi}" y1="${Y}" x2="${xi}" y2="${Y + 18}" stroke="#e8505b" stroke-width="2.5" marker-end="url(#ahR)"/>`
+          + txt(xi, Y + 30, '倒立缩小实像', 'r')
+          + ray(xi, Y + 18, Xe, Y - 10, '#ff9f1a') + ray(xi, Y + 18, Xe, Y + 10, '#00a37a');
+      } else if (c.ready) {
+        const xi = Xo + s.fo * k * 0.55;
+        rays = ray(Xo, Y - 22, xi, Y + 14, '#ff9f1a') + `<circle cx="${xi}" cy="${Y + 14}" r="3" fill="#e8505b"/>`;
+      }
+      const mag = c.ready ? c.M : 1;
+      const eye = (() => {
+        const blur = !c.ready || c.stage !== 'ok';
+        const size = 12 + (c.ready && c.stage === 'ok' ? Math.min(mag, 8) * 3 : 0);
+        return `<g transform="translate(268,10)">
+          <rect width="86" height="86" rx="43" fill="#1a2030" stroke="#445" stroke-width="3"/>
+          <circle cx="43" cy="43" r="36" fill="#0d1520"/>
+          <text x="43" y="40" text-anchor="middle" font-size="${size}" ${blur ? 'opacity=".35" filter="url(#blur)"' : ''} transform="rotate(180 43 36)">${tip}</text>
+          <text x="43" y="64" text-anchor="middle" fill="${c.stage === 'ok' ? '#9fef9f' : '#efbf6f'}" font-size="10" font-weight="800">${!c.ready ? '先装透镜' : c.stage === 'ok' ? `清晰 · 视角×${f1(mag)}` : c.stage === 'short' ? '镜筒太短' : c.stage === 'long' ? '镜筒太长' : '接近对焦'}</text>
+          <text x="43" y="98" class="st m" text-anchor="middle">目镜视野</text>
+        </g>`;
+      })();
+      const naked = `<g transform="translate(268,118)">
+        <rect width="86" height="50" rx="10" fill="#fff" stroke="#cfd6ea"/>
+        <text x="43" y="28" text-anchor="middle" font-size="14">${tip}</text>
+        <text x="43" y="44" text-anchor="middle" class="st m">裸眼视角（小）</text>
+      </g>`;
+      const status = !c.ready ? '动手组装：选长焦距物镜 + 短焦距目镜'
+        : c.stage === 'ok' ? `✅ 对焦成功！L≈f物+f目=${f1(c.ideal)} cm，视角放大 ≈ ${f1(c.M)} 倍`
+        : `目标镜筒长 ≈ ${f1(c.ideal)} cm（现在 ${f1(s.L)} cm）`;
+      return `<svg viewBox="0 0 360 210" class="sim-svg" style="touch-action:none">${arrowDefs}
+        <defs><filter id="blur"><feGaussianBlur stdDeviation="2.4"/></filter></defs>
+        <rect width="360" height="210" fill="#f7fbff"/>
+        <line x1="8" y1="${Y}" x2="250" y2="${Y}" stroke="#9aa3bf" stroke-width="2"/>
+        ${parallel}${tube}${lenses}${rays}${eye}${naked}
+        ${txt(140, 16, status, c.stage === 'ok' ? 'ok b' : 'm')}
+      </svg>`;
+    },
+    read(s) {
+      const c = teleCalc(s);
+      if (!c.ready) return [['物镜', '未选', 'r'], ['目镜', '未选', 'r'], ['状态', '组装中', '']];
+      return [
+        ['理想筒长', f1(c.ideal) + ' cm', 'bl'],
+        ['当前 L', f1(s.L) + ' cm', c.focus ? 'ok' : ''],
+        ['视角放大', `≈ f物/f目 = ${f1(c.M)}`, c.focus ? 'ok' : ''],
+      ];
+    },
+    tip(s) {
+      const c = teleCalc(s);
+      if (!c.ready) return '开普勒望远镜：物镜焦距<b>长</b>，目镜焦距<b>短</b>。远处物体的像成在物镜焦点附近（倒立缩小实像），目镜再把它放大，<b>视角变大</b>，看起来更近。';
+      if (c.stage === 'ok') return `镜筒长 L ≈ f物 + f目 = ${s.fo}+${s.fe}=<b>${f1(c.ideal)} cm</b>。视角放大率 ≈ f物/f目 = <b>${f1(c.M)}</b>。最终像是倒立的。和显微镜比：显微镜物镜焦距短、看近处；望远镜物镜焦距长、看远处。`;
+      return `把镜筒调到约 <b>${f1(c.ideal)} cm</b>（f物+f目）。太短或太长，目镜视野都会模糊。`;
+    },
+    tasks: [
+      { t: '选出<b>长焦距物镜</b>（≥16 cm）和<b>短焦距目镜</b>（≤4 cm）', hint: '望远镜和显微镜刚好相反：物镜要长、目镜要短', check: s => s.fo >= 16 && s.fe > 0 && s.fe <= 4 },
+      { t: '调节镜筒长度，使 L ≈ f物 + f目，目镜视野<b>清晰</b>', hint: '看读数区的「理想筒长」', check: (s) => teleCalc(s).focus },
+      { t: '换一个观察目标，体会视角被放大', hint: '切换月亮 / 塔 / 鸟，对焦后视野里目标明显变大', check: (s) => teleCalc(s).focus && s.target !== 'moon' },
+      { t: '说出望远镜与显微镜的关键区别（读提示）', hint: '物镜焦距：望远要长、显微要短；一个看远、一个看近', check: (s) => teleCalc(s).focus && s.fo >= 16 && s.fe <= 4 },
+    ],
+  };
+
+
+  const SIMS = [light, lens, lever, buoy, ohm, magnifier, microscope, telescope];
   const BY = Object.fromEntries(SIMS.map(s => [s.id, s]));
   let prog = store.get('wl_sim', {});   // id -> 已完成任务数组 [true,...]
   const doneN = id => (prog[id] || []).filter(Boolean).length;
@@ -326,6 +674,7 @@
   function openSim(id, src) {
     C.stopAll(); $('#modal').hidden = true;
     cur = BY[id]; from = src || 'lab'; st = cur.init(); armed = false; celebrating = false;
+    if (cur.ch && C.track) C.track('c', cur.ch);
     C.setView('sim'); C.setBrand(cur.emoji + ' ' + cur.name);
     ti = firstTodo();
     if (ti < cur.tasks.length && cur.tasks[ti].setup) cur.tasks[ti].setup(st);
@@ -336,14 +685,18 @@
     $('#simCtrl').innerHTML = cur.ctrls.map(c => {
       if (c.type === 'range') return `<div class="sc-row"><div class="sc-l">${c.label}<b data-out="${c.key}"></b></div><input type="range" data-k="${c.key}" min="${c.min}" max="${c.max}" step="${c.step}"></div>`;
       if (c.type === 'seg') return `<div class="sc-row"><div class="sc-l">${c.label}</div><div class="seg" data-seg="${c.key}">${c.opts.map(([v, l]) => `<button data-v="${v}">${l}</button>`).join('')}</div></div>`;
+      if (c.type === 'tray') return `<div class="sc-row tray-row"><div class="sc-l">${c.label}</div><div class="tray" data-tray="${c.key}">${c.opts.map(([v, l, tip]) => `<button class="tray-chip" data-v="${v}" title="${tip || ''}">${l}</button>`).join('')}</div></div>`;
+      if (c.type === 'note') return `<div class="sc-note">${c.html}</div>`;
       return `<div class="sc-row step"><div class="sc-l">${c.label}</div><div class="stepper"><button data-st="${c.key}" data-d="-1">−</button><b data-out="${c.key}"></b><button data-st="${c.key}" data-d="1">＋</button></div></div>`;
     }).join('');
   }
   function syncCtrls() {
     cur.ctrls.forEach(c => {
+      if (c.type === 'note') return;
       const out = $(`[data-out="${c.key}"]`, $('#simCtrl')); if (out) out.textContent = c.fmt(st[c.key]);
       const r = $(`input[data-k="${c.key}"]`); if (r && +r.value !== st[c.key]) r.value = st[c.key];
       $$(`[data-seg="${c.key}"] button`).forEach(b => b.classList.toggle('on', String(st[c.key]) === b.dataset.v));
+      $$(`[data-tray="${c.key}"] .tray-chip`).forEach(b => b.classList.toggle('on', String(st[c.key]) === b.dataset.v));
     });
   }
   function change(key, v) { if (st[key] === v) return; st[key] = v; armed = true; update(); }
@@ -351,10 +704,43 @@
   $('#simCtrl').addEventListener('click', e => {
     const sb = e.target.closest('.seg button');
     if (sb) { SFX.tap(); const key = sb.parentNode.dataset.seg, c = cur.ctrls.find(x => x.key === key); const v = c.opts.find(o => String(o[0]) === sb.dataset.v)[0]; return change(key, v); }
+    const tb = e.target.closest('.tray-chip');
+    if (tb) { SFX.flip(); const key = tb.parentNode.dataset.tray, c = cur.ctrls.find(x => x.key === key); const raw = c.opts.find(o => String(o[0]) === tb.dataset.v)[0]; return change(key, typeof raw === 'number' ? raw : raw); }
     const pb = e.target.closest('[data-st]');
     if (pb) { SFX.tap(); const c = cur.ctrls.find(x => x.key === pb.dataset.st); change(c.key, clamp(st[c.key] + +pb.dataset.d, c.min, c.max)); }
   });
-  function update() {
+  let drag = null;
+  (function bindStageDrag() {
+    const stage = $('#simStage');
+    const svgPos = e => {
+      const svg = stage.querySelector('svg'); if (!svg) return null;
+      const r = svg.getBoundingClientRect(), vb = svg.viewBox.baseVal;
+      return { x: (e.clientX - r.left) / r.width * vb.width, y: (e.clientY - r.top) / r.height * vb.height, svg };
+    };
+    stage.addEventListener('pointerdown', e => {
+      const h = e.target.closest('[data-drag]'); if (!h || !cur) return;
+      const key = h.dataset.drag, c = cur.ctrls.find(x => x.key === key && x.type === 'range'); if (!c) return;
+      drag = { key, c, map: h.dataset.map || '', px: +(h.dataset.px || 1), lensx: +(h.dataset.lensx || 0) };
+      try { stage.setPointerCapture(e.pointerId); } catch (_) {}
+      e.preventDefault(); SFX.tap();
+    });
+    stage.addEventListener('pointermove', e => {
+      if (!drag) return;
+      const p = svgPos(e); if (!p) return;
+      const step = drag.c.step || 1;
+      let v;
+      if (drag.map === 'left') v = (drag.lensx - p.x) / drag.px;
+      else if (drag.map === 'abs') v = p.x / drag.px;
+      else v = p.x / drag.px;
+      v = clamp(Math.round(v / step) * step, drag.c.min, drag.c.max);
+      // Avoid full redraw thrash: patch state + soft update when value changes
+      if (st[drag.key] !== v) { st[drag.key] = v; armed = true; softUpdate(); }
+      e.preventDefault();
+    });
+    const up = () => { drag = null; };
+    stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+  })();
+  function softUpdate() {
     syncCtrls();
     $('#simStage').innerHTML = cur.draw(st);
     $('#simRead').innerHTML = cur.read(st).map(([k, v, c]) => `<div class="sr ${c}"><span>${k}</span><b>${v}</b></div>`).join('');
@@ -362,6 +748,7 @@
     drawTask();
     if (armed && !celebrating && ti < cur.tasks.length && cur.tasks[ti].check(st, cur)) complete();
   }
+  function update() { softUpdate(); }
   function drawTask(justDone) {
     const n = cur.tasks.length, p = prog[cur.id] || [];
     const dots = cur.tasks.map((_, k) => `<span class="td${p[k] ? ' on' : ''}${k === ti && !justDone ? ' cur' : ''}"></span>`).join('');
